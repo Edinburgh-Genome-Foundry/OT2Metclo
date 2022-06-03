@@ -1,5 +1,6 @@
 import profile
 from opentrons import protocol_api
+import pandas as pd
 
 metadata = {
     'apiLevel': '2.12',
@@ -38,6 +39,8 @@ def run(protocol: protocol_api.ProtocolContext):
 ################################################################################
 # Assembly Plan
 ################################################################################
+    xfile = input("Enter pathway to excel (.xlsx) document: ")
+    df = pd.read_excel (r'xfile')
     Assembly = [['frag1', 32,2250],['frag2',26,3000], ['frag3', 17,3400],['vector',20, 8000]]
     def __calcfmol__(c,bp):
         n = c/(660*bp)* 10^15
