@@ -50,13 +50,10 @@ def run(protocol: protocol_api.ProtocolContext):
     # volume is too small for the pipette
     lpipette.transfer(0.5,reagent_plate()['B1'], tc_plate()['A1']) #ligase
     lpipette.transfer(0.5,reagent_plate()['C1'], tc_plate()['A1']) #bsaI
-
     lpipette.transfer(3,reagent_plate()['A2'], tc_plate()['A1']) #insert1
     lpipette.transfer(2,reagent_plate()['B2'], tc_plate()['A1']) #insert2
     lpipette.transfer(2.5,reagent_plate()['C2'], tc_plate()['A1']) #insert3
-
     lpipette.transfer(2.5,reagent_plate()['H1'], tc_plate()['A1']) #Assembly vector
-
     lpipette.transfer(7,reagent_plate()['D1'], tc_plate()['A1'])  #water
 
     
