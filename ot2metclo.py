@@ -16,7 +16,6 @@ def run(protocol: protocol_api.ProtocolContext):
 ################################################################################
     thermocycler = protocol.load_module('thermocycler')
     tc_plate = thermocycler.load_labware('biorad_96_wellplate_200ul_pcr')
-    thermocycler.set_temperature(4)
     tr_20 = protocol.load_instrument('opentrons_96_tiprack_20ul','1')
     lpipette = protocol.load_instrument('p20_single', 'left', tip_racks=tr_20)
     reagent_plate = protocol.load_labware('nest_96_wellplate_200ul_flat','2')
@@ -35,7 +34,15 @@ def run(protocol: protocol_api.ProtocolContext):
     insert2 = reagent_plate.wells('B2')
     insert3 = reagent_plate.wells('C2')
     Assembly_v = reagent_plate.wells('H1')
-    
+
+################################################################################
+# Assembly Plan
+################################################################################
+    Assembly = [['frag1', 32,2250],['frag2',26,3000], ['frag3', 17,3400],['vector',20, 8000]]
+    def __calcfmol__(c,bp):
+        n = c/(660*bp)* 10^15
+        return n
+
 ################################################################################
 # PROTOCOL
 ################################################################################
@@ -49,6 +56,8 @@ def run(protocol: protocol_api.ProtocolContext):
     lpipette.transfer(2,reagent_plate()['A1'], tc_plate()['A1']) #ligase buffer
     # volume is too small for the pipette
     lpipette.transfer(0.5,reagent_plate()['B1'], tc_plate()['A1']) #ligase
+    if assemblysize > 30000
+        lpipette.transfer(1,reagent_plate()['C1'], tc_plate()['A1']) #bsaI
     lpipette.transfer(0.5,reagent_plate()['C1'], tc_plate()['A1']) #bsaI
     lpipette.transfer(3,reagent_plate()['A2'], tc_plate()['A1']) #insert1
     lpipette.transfer(2,reagent_plate()['B2'], tc_plate()['A1']) #insert2
@@ -56,5 +65,21 @@ def run(protocol: protocol_api.ProtocolContext):
     lpipette.transfer(2.5,reagent_plate()['H1'], tc_plate()['A1']) #Assembly vector
     lpipette.transfer(7,reagent_plate()['D1'], tc_plate()['A1'])  #water
 
-    
+    thermocycler.set_lid_temperature(85)
+    thermocycler.set_block_temperature(37, hold_time_minutes=15, block_max_volume=20)
+    thermocycler.close_lid()
+    #they are updating this. the next release 6.0.0 is expected to solve this issue
+    profile = [
+        {'temperature': 37, 'hold_time_minutes': 2},
+        {'temperature': 16, 'hold_time_minutes': 5},
+        {'temperature': 37, 'hold_time_minutes': 20},
+        {'temperature': 80, 'hold_time_minutes': 5}
+    ]
+    thermocycler.execute_profile(steps=profile, repetitions = 45, block_max_volume=20) 
+    thermocycler.deactivate()
+    thermocycler.open_lid()
+
+
+
+
 
