@@ -34,7 +34,11 @@ while True:
 
 #make array [vector name, size, concetration], [Insert1 name, size, conc.]...]
     #array called assembly
-#Calculates mastermix volumes.
+
+
+
+plasmidvol_array = [0]*numberofinsertplasmids+1
+
 def __calcpv__ (plasmid_size, ugul):
     num_copies_fmolul = ugul*math.avogadro/(plasmid_size*10**15*650)
     plasmid_volume = 15/num_copies_fmolul
@@ -49,25 +53,21 @@ def __calcmm__(plasmid_volume, assembly_size):
     ligase_buffer = 2
     DNA_ligase = 0.5
     water = 20-plasmid_volume - bsai - ligase_buffer - DNA_ligase
-    arr = [plasmid volume, bsai, ligase_buffer, DNA_ligase, water]
-    return arr*1.5
+    arr = [plasmid_volume, bsai, ligase_buffer, DNA_ligase, water]
+    return arr*1.25
 
-#there is a better way of writing this
+
 assembly_vol = [0]*(insert_count+1)
-sum_assembly_vol = [0]*(insert_count+1)
+sum_assembly_vol = [0]*4
 
 for i in length(assembly):
     plasmid_volume = __calcpv__(assembly[i][1], assembly[i][1])
     plasmid_mm = __calcmm_(plasmid_volume, assembly_size)
     assembly_vol[i] = plasmid_mm
+    sum_assembly_vol = np.add(sum_assembly_vol, assembly_vol[i][1:])  
 
 
-        
-
-
-
-
-#Output Lawbare setup plan and OT2 input
+#Output Lawbare setup plan and OT2 input Excel format 
 
 
 
