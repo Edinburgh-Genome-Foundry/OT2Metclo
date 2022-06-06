@@ -50,33 +50,30 @@ def run(protocol: protocol_api.ProtocolContext):
 #    xfile = input("Enter pathway to excel (.xlsx) document: ")
 #    df = pd.read_excel (r'xfile')
 #    Assembly = [['frag1', 32,2250],['frag2',26,3000], ['frag3', 17,3400],['vector',20, 8000]]
-    
+    assemblysize = 20000   
 
-    #lpipette.pick_up_tip()
+
     lpipette.transfer(2,reagent_plate['A1'], tc_plate['A1']) #ligase buffer
     # volume is too small for the pipette
-    '''
-    lpipette.transfer(0.5,reagent_plate()['B1'], tc_plate()['A1']) #ligase
+
+    lpipette.transfer(0.5,reagent_plate['B1'], tc_plate['A1']) #ligase
     if assemblysize > 30000:
-        lpipette.transfer(1,reagent_plate()['C1'], tc_plate()['A1']) #bsaI
+        lpipette.transfer(1,reagent_plate['C1'], tc_plate['A1']) #bsaI
     else: 
-        lpipette.transfer(0.5,reagent_plate()['C1'], tc_plate()['A1']) #bsaI
-    lpipette.transfer(3,reagent_plate()['A2'], tc_plate()['A1']) #insert1
-    lpipette.transfer(2,reagent_plate()['B2'], tc_plate()['A1']) #insert2
-    lpipette.transfer(2.5,reagent_plate()['C2'], tc_plate()['A1']) #insert3
-    lpipette.transfer(2.5,reagent_plate()['H1'], tc_plate()['A1']) #Assembly vector
-    lpipette.transfer(7,reagent_plate()['D1'], tc_plate()['A1'])  #water
+        lpipette.transfer(0.5,reagent_plate['C1'], tc_plate['A1']) #bsaI
+    lpipette.transfer(3,reagent_plate['A2'], tc_plate['A1']) #insert1
+    lpipette.transfer(2,reagent_plate['B2'], tc_plate['A1']) #insert2
+    lpipette.transfer(2.5,reagent_plate['C2'], tc_plate['A1']) #insert3
+    lpipette.transfer(2.5,reagent_plate['H1'], tc_plate['A1']) #Assembly vector
+    lpipette.transfer(7,reagent_plate['D1'], tc_plate['A1'])  #water
     tc_mod.set_lid_temperature(85)
     tc_mod.set_block_temperature(37, hold_time_minutes=15, block_max_volume=20)
     tc_mod.close_lid()
-    #they are updating this. the next release 6.0.0 is expected to solve this issue
-    profile = [
-        {'temperature': 37, 'hold_time_minutes': 2},
-        {'temperature': 16, 'hold_time_minutes': 5},
-        {'temperature': 37, 'hold_time_minutes': 20},
-        {'temperature': 80, 'hold_time_minutes': 5}
-    ]
-    tc_mod.execute_profile(steps=profile, repetitions = 45, block_max_volume=20) 
+
+    for x in range(45):
+        tc_mod.set_block_temperature(37, hold_time_minutes=2, block_max_volume=20)
+        tc_mod.set_block_temperature(16, hold_time_minutes=5, block_max_volume=20)
+        tc_mod.set_block_temperature(37, hold_time_minutes=20, block_max_volume=20)
+
     tc_mod.deactivate()
     tc_mod.open_lid()
-'''
