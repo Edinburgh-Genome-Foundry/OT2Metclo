@@ -13,34 +13,16 @@ PROCESS:
 '''
 import pandas as pd
 import numpy as np
-import math
+from scipy.constants import Avogadro 
 
-#Input Excel file
-while True:
-    try:
-        xfile = input(r'Input the pathway to the excel file: ')
-        xl_file = pd.ExcelFile('xfile') 
-    except:
-        print('Excel file needed, try again.')
-    else:
-        break
+#Input excel file
+xl_file = (pd.read_excel(r'/home/dany/data/software/metclo_gh/metclo/testAssinput.xlsx', header = None)).to_numpy()
+line_len= len(xl_file)
 
-#get number of inserts, and their data
-
-#get vector and its data
-
-#get assembly size 
-#assembly_size = excel cel number XXXX
-
-#make array [vector name, size, concetration], [Insert1 name, size, conc.]...]
-    #array called assembly
-
-
-
-plasmidvol_array = [0]*numberofinsertplasmids+1
+plasmid_vol = [0]*(line_len-1)
 
 def __calcpv__ (plasmid_size, ugul):
-    num_copies_fmolul = ugul*math.avogadro/(plasmid_size*10**15*650)
+    num_copies_fmolul = round((ugul*Avogadro/(plasmid_size*10**15*650)),3)
     plasmid_volume = 15/num_copies_fmolul
     return plasmid_volume
 
@@ -57,23 +39,13 @@ def __calcmm__(plasmid_volume, assembly_size):
     return arr*1.25
 
 
-assembly_vol = [0]*(insert_count+1)
-sum_assembly_vol = [0]*4
-
-for i in length(assembly):
-    plasmid_volume = __calcpv__(assembly[i][1], assembly[i][1])
-    plasmid_mm = __calcmm_(plasmid_volume, assembly_size)
-    assembly_vol[i] = plasmid_mm
-    sum_assembly_vol = np.add(sum_assembly_vol, assembly_vol[i][1:])  
+for i in range (len(xl_file)-1):
+    plasmid_volume = __calcpv__(xl_file[i][1], int(xl_file[i][2]))
+    print(type(plasmid_volume))
+    plasmid_mm = __calcmm__(plasmid_volume, xl_file[-1][1])
+    #print(plasmid_vol + ' ' + plasmid_mm)
+    #assembly_vol[i] = plasmid_mm
+    #sum_assembly_vol = np.add(sum_assembly_vol, assembly_vol[i][1:])  
 
 
 #Output Lawbare setup plan and OT2 input Excel format 
-
-
-
-
-
-
-
-
-
