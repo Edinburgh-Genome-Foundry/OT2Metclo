@@ -15,37 +15,58 @@ import pandas as pd
 import numpy as np
 from scipy.constants import Avogadro 
 
-#Input excel file
-xl_file = (pd.read_excel(r'/home/dany/data/software/metclo_gh/metclo/testAssinput.xlsx', header = None)).to_numpy()
-line_len= len(xl_file)
+#the plasmids carry the insert/part [bp, concentration ng/ul]
+part1 = np.array([13000, 78,0.0])
+part2 = np.array([14000, 70,0.0])
+part3 = np.array([18000, 50,0.0])
+part4 = np.array([13000, 40,0.0])
+part5 = np.array([14000, 60,0.0])
+part6 = np.array([11000, 55,0.0])
+partarr =np.array([part1, part2, part3, part4, part5, part6])
 
-plasmid_vol = [0]*(line_len-1)
+#the assembly vectors compiling the parts/inserts  [bp, concentration ng/ul]
+assembly_v = [8000,66,0.0]
 
+#Final Assembly size
+assembly_size = 54200 
+
+
+
+
+#the protocol says it need 30fmol of plasmid within the master mix. Method to calculate volume needed
 def __calcpv__ (plasmid_size, ugul):
-    num_copies_fmolul = round((ugul*Avogadro/(plasmid_size*10**15*650)),3)
+    num_copies_fmolul = round(ugul/plasmid_size * 1000000/650,3)
+    print(num_copies_fmolul)
     plasmid_volume = 15/num_copies_fmolul
+    print(type(plasmid_volume))
     return plasmid_volume
+    
 
 #calculates the master mix volume for a single plasmid
-def __calcmm__(plasmid_volume, assembly_size):
+def __calcmm__(volumesum,assembly_size):
+    ''' optional bsai volume difference depending on final assembly size
     if assembly_size <= 30000:
         bsai = 0.5
     else:
         bsai = 1
+    '''
+    bsai = 0.5
     ligase_buffer = 2
     DNA_ligase = 0.5
-    water = 20-plasmid_volume - bsai - ligase_buffer - DNA_ligase
-    arr = [plasmid_volume, bsai, ligase_buffer, DNA_ligase, water]
+    water = 0
+    if volumesum <=20:
+        water = 20-plasmid_volume - bsai - ligase_buffer - DNA_ligase
+    arr = [bsai, ligase_buffer, DNA_ligase, water]
+    print(type(arr[3]))
     return arr*1.25
 
+#the protocol says it need 30fmol of plasmid within the master mix. Method to calculate volume needed
+volumesum = 0
+for i in partarr:
+    i[2] = 30/(i[1]/i[0] * 1000000/650)
+    volumesum += i[2]
 
-for i in range (len(xl_file)-1):
-    plasmid_volume = __calcpv__(xl_file[i][1], int(xl_file[i][2]))
-    print(type(plasmid_volume))
-    plasmid_mm = __calcmm__(plasmid_volume, xl_file[-1][1])
-    #print(plasmid_vol + ' ' + plasmid_mm)
-    #assembly_vol[i] = plasmid_mm
-    #sum_assembly_vol = np.add(sum_assembly_vol, assembly_vol[i][1:])  
+assembly_v[2] = 30/(i[1]/i[0] * 1000000/650)
+volumesum += assembly_v[2]
 
-
-#Output Lawbare setup plan and OT2 input Excel format 
+print(__calcmm__(volumesum,assembly_size))
