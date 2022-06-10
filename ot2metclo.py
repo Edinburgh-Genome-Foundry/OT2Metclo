@@ -2,6 +2,26 @@ import profile
 from opentrons import protocol_api
 #import pandas as pd
 
+################################################################################
+# METHODS
+################################################################################
+def __calcvolume__ (ngul, bp):
+    'takes the concentration in ng/ul and sequence lenght of the sample and finds the volume needed containing 30fmol'
+    volume = round(30/((ngul/(1e-6))/(bp*617.96+ 36.04)),3)
+    return volume
+
+def __getparts__ (file):
+    with open(file, 'r') as parts_file:
+        parts={}
+        for l in parts_file:  
+            name, ngul, bp = l.strip().split(',')
+            volume = __calcvolume__(float(ngul),int(bp))
+            parts[name]=[float(ngul),int(bp),volume] 
+    return(parts)
+
+
+
+
 metadata = {
     'apiLevel': '2.0',
     'protocolName': 'Metclo Assembly - hardcoded 6 part assembly',
@@ -49,15 +69,15 @@ def run(protocol: protocol_api.ProtocolContext):
 # Assembly Plan
 ################################################################################
 #Creating Master Mix
-    lpipette.transfer(2,reagent_plate['A1'], tc_plate['A1']) 
-    lpipette.transfer(0.5,reagent_plate['B1'], tc_plate['A1']) #ligase
-    lpipette.transfer(2,reagent_plate['A2'], tc_plate['A1']) #part1
-    lpipette.transfer(2,reagent_plate['B2'], tc_plate['A1']) #part2
-    lpipette.transfer(2,reagent_plate['C2'], tc_plate['A1']) #part3
-    lpipette.transfer(2,reagent_plate['D2'], tc_plate['A1']) #part4
-    lpipette.transfer(2,reagent_plate['E2'], tc_plate['A1']) #part5
-    lpipette.transfer(2,reagent_plate['F2'], tc_plate['A1']) #part6
-    lpipette.transfer(2,reagent_plate['H1'], tc_plate['A1']) #Assembly vector
+    lpipette.transfer(2,ligase_buffer, tc_plate['A1']) 
+    lpipette.transfer(0.5,ligase, tc_plate['A1']) #ligase
+    lpipette.transfer(2,part1, tc_plate['A1']) #part1
+    lpipette.transfer(2,part2, tc_plate['A1']) #part2
+    lpipette.transfer(2,part3, tc_plate['A1']) #part3
+    lpipette.transfer(2,part4, tc_plate['A1']) #part4
+    lpipette.transfer(2,part5, tc_plate['A1']) #part5
+    lpipette.transfer(2,part6, tc_plate['A1']) #part6
+    lpipette.transfer(2,Assembly_v, tc_plate['A1']) #Assembly vector
     
     #There is an optional step in protocol to ad 1ul of Bsai to assemblies larger than 30kb
     '''
@@ -69,10 +89,10 @@ def run(protocol: protocol_api.ProtocolContext):
         lpipette.transfer(3,reagent_plate['D1'], tc_plate['A1']) 
     '''
     
-    lpipette.transfer(0.5,reagent_plate['C1'], tc_plate['A1']) #bsaI
+    lpipette.transfer(0.5,bsai, tc_plate['A1']) #bsaI
     #the master mix should equal 20. This volume is reached with the addition of water
     #this volume is variable
-    lpipette.transfer(3,reagent_plate['D1'], tc_plate['A1'])  #water
+    lpipette.transfer(3,water, tc_plate['A1'])  #water
 
 #Thermocycler
     tc_mod.set_lid_temperature(85)
