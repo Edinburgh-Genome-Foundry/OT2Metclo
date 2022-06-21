@@ -16,9 +16,10 @@ def get_values(*names):
     )
     return [_all_values[n] for n in names]
 
-print('test to push to github')
+
 # metadata
 metadata = {
+    "apiLevel": '2.3',
     "protocolName": "EGF base protocol",
     "author": "Peter Vegh <egf-software@ed.ac.uk>",
     "description": "Simple protocol to get started using the OT-2",
@@ -26,8 +27,8 @@ metadata = {
 
 
 def run(protocol: protocol_api.ProtocolContext):
-    pip_model, pip_mount, destination_plate, source_plate = get_values(  # noqa: F821
-        "pip_model", "pip_mount", "destination_plate", "source_plate"
+    p20, p20_mount, p300_single_gen2, p300_mount, destination_plate, source_plate = get_values(  # noqa: F821
+        "p20", "p20_mount", "p300_single_gen2", "p300_mount", "destination_plate", "source_plate"
     )
 
     # SETUP
