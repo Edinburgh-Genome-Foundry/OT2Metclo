@@ -1,6 +1,7 @@
 import profile, string
 from opentrons import protocol_api
 
+
 ################################################################################
 # METHODS
 ################################################################################
@@ -43,7 +44,7 @@ print('PARTS name:[ng/ul, bp, volume]\n',parts, '\nREAGENTS reagent:[volume]', r
 ################################################################################
 
 metadata = {
-    'apiLevel': '2.1',
+    'apiLevel': '2.3',
     'protocolName': 'Metclo Assembly - hardcoded 6 part assembly',
     'author': 'Daniella Matute <daniella.l.matute@gmail.com',
     'description':'OT-2 protocol that allows for methylase DNA assembly'
@@ -55,11 +56,20 @@ def run(protocol: protocol_api.ProtocolContext):
 # LABWARE
 # nest_96_wellplate_100ul_pcr, is placed on the top of the TempDeck 
 ################################################################################
-    tc_mod = protocol.load_module('Thermocycler Module')
+
+    # Load a Temperature Module GEN1 in deck slot.
+    temperature_module = protocol.load_module("temperature module", 1)
+    # Load a Magnetic Module GEN2 in deck slot.
+    magnetic_module = protocol.load_module("magnetic module gen2", 4)
+    # Thermocycler module:
+    tc_mod = protocol.load_module("thermocycler module")
+
     tc_plate = tc_mod.load_labware('biorad_96_wellplate_200ul_pcr')
-    tr_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
-    lpipette = protocol.load_instrument('p20_single_gen2', 'left', tip_racks=[tr_20])
-    reagent_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 4)
+
+    tr_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 3)
+    lpipette = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tr_20])
+    reagent_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 6)
+
     tc_mod.set_lid_temperature(4) 
     tc_mod.set_block_temperature(4)
     tc_mod.open_lid()
@@ -82,10 +92,12 @@ def run(protocol: protocol_api.ProtocolContext):
 # Assembly 
 ################################################################################
 #Creating Master Mix
+
     
     for i in parts:
         protocol.comment('Transferring '+ i)
         lpipette.transfer(parts[i][2],globals()[i], tc_plate['A1'])
+
     
     for i in reagents:
         protocol.comment('Transferring '+ i)
