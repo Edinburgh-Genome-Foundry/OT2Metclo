@@ -1,5 +1,6 @@
 import profile, string
 from opentrons import protocol_api
+import numpy as np
 
 ################################################################################
 # METHODS
@@ -29,17 +30,29 @@ def __calcreagents__ (parts, as_s):
         reagents[v] = eval(v) 
     return(reagents)
 
+def __checkwells__ (reagent_arr):
+    test = np.zeros(8, dtype=bool)
+    print(test)
+    for i in reagent_arr.T:
+        if i == test:
+            print('yay')
+
 alpha = dict(zip(range(0,8),string.ascii_uppercase))
+numb = np.linspace(1,12,12)
+reagent_arr = np.zeros((8,12), dtype=bool)
+constructarr = np.zeros((8,12), dtype=bool)
 
 #parts_file = input("Enter the path of your <parts>.txt:")
 # #assemblysize= int(input("Enter final assembly size (bp):") )
 parts_file = '/home/dany/data/software/GitHub/metclo/test_assembly_parts.txt'
 assemblysize= 800000
 
+
 parts = __getparts__(parts_file) 
 reagents = __calcreagents__ (parts, assemblysize)
 
 print("PARTS ('part_name':[ng/ul, bp, volume])\n",parts, "\n\nREAGENTS ('reagent':volume)", reagents, "\n\nASSEMBLY SIZE", assemblysize )
+__checkwells__(reagent_arr)
 ################################################################################
 # PROTOCOL
 ################################################################################
@@ -77,16 +90,20 @@ def run(protocol: protocol_api.ProtocolContext):
 ################################################################################
 # REAGENTS
 ################################################################################
-    #Reagents
-    globals()['ligase_buffer'] = reagent_plate.wells('A1')
-    globals()['ligase'] = reagent_plate.wells('B1')
-    globals()['bsai'] = reagent_plate.wells('C1')
-    globals()['water'] = reagent_plate.wells('D1')
+    #Filling the reagent plate
+
+
+    
+'''
+    globals()['ligase_buffer'] = part_plate.wells('A1')
+    globals()['ligase'] = part_plate.wells('B1')
+    globals()['bsai'] = part_plate.wells('C1')
+    globals()['water'] = part_plate.wells('D1')
     
     for key,v in parts.items():
         n = (list(parts.keys()).index(key))
         p = alpha[n] + '2'
-        globals()[key]= reagent_plate.wells(p)
+        globals()[key]= part_plate.wells(p)
 
 ################################################################################
 # Assembly 
