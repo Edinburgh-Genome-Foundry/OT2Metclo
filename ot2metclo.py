@@ -46,6 +46,9 @@ count = 0
 for i in range (len(assembly_data)):
     tcplate_position[i] = assembly_data[i][0]
 
+print(assembly_data)
+print(part_data)
+print(reagent_data)
 print(plate_position)
 print(tcplate_position)
 
@@ -85,16 +88,37 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
 
+    print(tcplate_position)
+    print(*tcplate_position)
+    print({*tcplate_position})
+    print([*tcplate_position])
+    print(type([*tcplate_position]))
+
 
 
 ################################################################################
 # REAGENTS
 ################################################################################
-    #Filling the reagent plate
-    for i in assembly_data:
+    for i in range (len(tcplate_position)):
+        p_20.distribute(2, part_plate['A1'], tc_plate.wells()[i])
+        #globals()[plate_position[i]] = part_plate.wells_by_name()[i]
+    #print(tc_plate.wells()[1])
+    
+    
         
+    
+    
+
 
     
+    
+
+    
+
+
+
+
+    '''
     for key,v in parts.items():
         n = (list(parts.keys()).index(key))
         p = alpha[n] + '2'
@@ -140,3 +164,4 @@ def run(protocol: protocol_api.ProtocolContext):
     tc_mod.set_lid_temperature(4) 
     tc_mod.set_block_temperature(4)
     protocol.comment('Metclo assembly done. Assembly is incubating at 4 degrees Celsius.')
+'''
