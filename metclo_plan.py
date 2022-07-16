@@ -1,4 +1,4 @@
-import csv
+import csv, math
 from sre_constants import SUCCESS
 import numpy as np
 import sys
@@ -101,3 +101,27 @@ data = (assembly_dictionary, part_dictionary, reagent_sum)
 
 for i in range (len(header)):
     __makecvs__(doc[i],header[i],data[i])
+
+
+def __volumecheck__ (i, x, count, plate):
+    if x/200 < 1:
+        print(i,x)
+        plate[count] = i
+        count +=1
+    else:
+        wells = math.ceil(x/200)
+        for t in range (wells):
+            plate[count] = i+ '.'+str(t+1)
+            count +=1
+    return plate, count
+
+if (len(part_dictionary)+len(reagent_sum) <= 96) == True:
+    plate = {}
+    count = 0
+    for i in reagent_sum:
+        plate, count = __volumecheck__(i, reagent_sum[i], count, plate)
+    for i in part_dictionary:
+        plate, count = __volumecheck__(i,part_dictionary[i][1], count, plate)
+else:
+    print('The sum of the parts and reagents is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
+    sys.exit(1)
