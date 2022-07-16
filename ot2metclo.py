@@ -1,4 +1,4 @@
-import profile, string
+import profile, string, csv
 from opentrons import protocol_api
 import numpy as np
 

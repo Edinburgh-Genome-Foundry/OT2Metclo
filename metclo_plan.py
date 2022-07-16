@@ -1,4 +1,5 @@
 import csv
+from sre_constants import SUCCESS
 import numpy as np
 import sys
 
@@ -8,23 +9,34 @@ def __countinstances__(uncompressed_parts):
         count_parts[i] = uncompressed_parts.count(i)
     return count_parts
 
-def __calcvolume__ (ngul, bp):
+def __calcvolume__(ngul, bp):
     'takes the concentration in ng/ul and sequence lenght of the sample and finds the volume needed containing 30fmol'
     volume = round(30/((ngul/(1e-6))/(bp*617.96+ 36.04)),3)
     return volume
 
-def __calcreagents__ (assembly_size, part_volumes):
+def __calcreagents__(assembly_size, part_volumes):
     ligase_buffer = 2.0
     ligase = 0.5
     bsai = 1.0 if assembly_size > 30000 else 0.5
     sum_parts = sum([ligase_buffer,ligase, bsai, part_volumes])
-    water = round(20 - sum_parts,3) if sum_parts < 20 else 0
-    reagents = {}
-    for v in ['ligase_buffer','ligase','bsai','water']:
-        reagents[v] = eval(v) 
-    return(reagents)
+    water = round(20 - sum_parts,3) if sum_parts < 20 else 0 
+    return bsai, water
 
-
+def __makecvs__(doc, header, data):
+    with open(doc,'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        try:
+            for i in data:
+                row = [i]
+                for j in data[i]:
+                    row.append(j)
+                writer.writerow(row)
+        except: 
+            for i in data:
+                row = [i, reagent_sum[i]]
+                writer.writerow(row)
+    print(doc,' written succesfully.')
 
 assemblies = []
 uncompressed_parts = []
@@ -76,21 +88,16 @@ for i in assemblies:
     part_volume_sum = 0
     for j in i[2:]:
         part_volume_sum += round(part_dictionary[j][0],3)
-    assembly_dictionary[i[0]] = [i[1],i[2:],__calcreagents__(int(i[1]),part_volume_sum)]
+    bsai, water = __calcreagents__(int(i[1]),part_volume_sum)
+    assembly_dictionary[i[0]] = [i[1],i[2:],bsai, water]
+    reagent_sum['ligase_buffer'] += 2*1.25
+    reagent_sum['ligase'] += 0.5*1.25
+    reagent_sum['bsai'] += bsai*1.25
+    reagent_sum['water'] += water*1.25
 
-for i in reagent_sum:
-    for j in assembly_dictionary:
-        original = reagent_sum[i]
-        reagent_sum[i] = original + ((assembly_dictionary[j])[2][i]*0.25)
+header = [['assembly name','assembly size', 'parts', 'bsai','water','heat shock'],['part name', 'single', 'sum'],['reagent', 'sum']]
+doc = ['assembly_data.csv','part_data.csv','reagents_data.csv']
+data = (assembly_dictionary, part_dictionary, reagent_sum)
 
-with open('data.txt','w') as f:
-    for i in assembly_dictionary:
-        w = "{},{},{},{}\n"
-        f.write(w.format(i, assembly_dictionary[i][0], assembly_dictionary[i][1], assembly_dictionary[i][2]))
-    for i in part_dictionary:
-        w = "{},{},{}\n"
-        f.write(w.format(i, part_dictionary[i][0],part_dictionary[i][1]))
-    for i in reagent_sum:
-        w = "{},{}\n"
-        f.write(w.format(i,reagent_sum[i])) 
-
+for i in range (len(header)):
+    __makecvs__(doc[i],header[i],data[i])
