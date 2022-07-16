@@ -1,6 +1,7 @@
-import profile, string, csv, sys
+import profile, string, csv, sys, math
 from opentrons import protocol_api
 import numpy as np
+
 
 def __openfile__(file):    
     try:
@@ -16,13 +17,40 @@ def __openfile__(file):
         print('File error.')
         sys.exit(1)
 
+def __volumecheck__ (i, x, count, plate):
+    if x/200 < 1:
+        plate[count] = i
+        count +=1
+    else:
+        wells = math.ceil(x/200)
+        for t in range (wells):
+            plate[count] = i+ '.'+str(t+1)
+            count +=1
+    return plate, count
+
+
+
 assembly_data =  __openfile__('assembly_data.csv')
 part_data = __openfile__('part_data.csv')
-reagents_data = __openfile__('reagents_data.csv')
+reagent_data = __openfile__('reagents_data.csv')
 
-print(assembly_data)
-print(part_data)
-print(reagents_data)
+plate_position = {}
+count = 0
+for i in reagent_data:
+    plate_position, count = __volumecheck__(i[0],float(i[1]),count, plate_position)
+for i in part_data:
+    plate_position, count = __volumecheck__(i[0],float(i[1]),count, plate_position)
+
+tcplate_position = {}
+count = 0
+for i in range (len(assembly_data)):
+    tcplate_position[i] = assembly_data[i][0]
+
+print(plate_position)
+print(tcplate_position)
+
+
+
 
 
 metadata = {
@@ -63,11 +91,9 @@ def run(protocol: protocol_api.ProtocolContext):
 # REAGENTS
 ################################################################################
     #Filling the reagent plate
+    for i in assembly_data:
+        
 
-    globals()['ligase_buffer'] = part_plate.wells('A1')
-    globals()['ligase'] = part_plate.wells('B1')
-    globals()['bsai'] = part_plate.wells('C1')
-    globals()['water'] = part_plate.wells('D1')
     
     for key,v in parts.items():
         n = (list(parts.keys()).index(key))
