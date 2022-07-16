@@ -1,6 +1,29 @@
-import profile, string, csv
+import profile, string, csv, sys
 from opentrons import protocol_api
 import numpy as np
+
+def __openfile__(file):    
+    try:
+        with open(file, newline='') as csvfile:
+            rows = csv.reader(csvfile)
+            header = next(rows)
+            if header != None:
+                data = []
+                for j in rows:
+                    data.append(j)
+                return data
+    except:
+        print('File error.')
+        sys.exit(1)
+
+assembly_data =  __openfile__('assembly_data.csv')
+part_data = __openfile__('part_data.csv')
+reagents_data = __openfile__('reagents_data.csv')
+
+print(assembly_data)
+print(part_data)
+print(reagents_data)
+
 
 metadata = {
     'apiLevel': '2.3',
@@ -13,21 +36,29 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ################################################################################
 # LABWARE
-# nest_96_wellplate_100ul_pcr, is placed on the top of the TempDeck 
 ################################################################################    
     # Modules
     temp_module = protocol.load_module("temperature module", 1)
     mag_module = protocol.load_module("magnetic module gen2", 4)
     tc_mod = protocol.load_module("thermocycler module")
+
     # Labware
     tr_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 9)
     tr_300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     part_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 2)
     tc_plate = tc_mod.load_labware('biorad_96_wellplate_200ul_pcr')
     falcon = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical',5)
+    
     # Instrument
     p_20 = protocol.load_instrument('p20_single_gen2', 'left', tip_racks=[tr_20])
     p_300 = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tr_300])
+
+
+
+
+
+
+
 ################################################################################
 # REAGENTS
 ################################################################################
@@ -42,6 +73,13 @@ def run(protocol: protocol_api.ProtocolContext):
         n = (list(parts.keys()).index(key))
         p = alpha[n] + '2'
         globals()[key]= part_plate.wells(p)
+
+
+
+
+
+
+
 
 ################################################################################
 # Assembly 
