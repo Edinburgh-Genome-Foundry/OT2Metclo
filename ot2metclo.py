@@ -46,11 +46,11 @@ count = 0
 for i in range (len(assembly_data)):
     tcplate_position[i] = assembly_data[i][0]
 
-print(assembly_data)
-print(part_data)
-print(reagent_data)
-print(plate_position)
-print(tcplate_position)
+print('assembly_data\n',assembly_data)
+print('part_data\n',part_data)
+print('reagent_data\n',reagent_data)
+print('plate_position',plate_position)
+print('tcplate_position\n',tcplate_position)
 
 
 
@@ -77,7 +77,7 @@ def run(protocol: protocol_api.ProtocolContext):
     tr_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 9)
     tr_300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     part_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 2)
-    tc_plate = tc_mod.load_labware('biorad_96_wellplate_200ul_pcr')
+    tc_plate = tc_mod.load_labware('biorad_96_wellplate_100ul_pcr')
     falcon = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical',5)
     
     # Instrument
@@ -86,36 +86,22 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
 
-
-
-    print(tcplate_position)
-    print(*tcplate_position)
-    print({*tcplate_position})
-    print([*tcplate_position])
-    print(type([*tcplate_position]))
-
-
-
 ################################################################################
 # REAGENTS
 ################################################################################
-    for i in range (len(tcplate_position)):
-        p_20.distribute(2, part_plate['A1'], tc_plate.wells()[i])
-        #globals()[plate_position[i]] = part_plate.wells_by_name()[i]
-    #print(tc_plate.wells()[1])
-    
-    
-        
-    
-    
 
 
     
-    
+    for i in plate_position:
+        a= plate_position[i]
+        print(a)
+        if a == reagent_data[0][0]: #ligase_buffer
+            p_20.distribute(2,part_plate.wells()[i], [tc_plate.wells()[w] for w in list(tcplate_position.keys())])
+            print('reagent')
+        if a.startswith('ligase') == True:
+            p_20.distribute(0.5,part_plate.wells()[i], [tc_plate.wells()[w] for w in list(tcplate_position.keys())])
 
     
-
-
 
 
     '''
