@@ -2,6 +2,9 @@ import csv, math
 from sre_constants import SUCCESS
 import numpy as np
 import sys
+from fpdf import FPDF
+from fpdf.enums import XPos, YPos
+
 
 def __countinstances__(uncompressed_parts):
     count_parts = {}
@@ -74,7 +77,7 @@ part_count = __countinstances__(uncompressed_parts)
 if len(part_count) > 96:
     print('Too manny parts. Max number of parts = 96, given number of parts = '+ str(len(part_count)))
     sys.exit(1)
-
+print(parts_con_bp)
 part_dictionary = {}
 for i in part_count:
     for j in parts_con_bp:
@@ -105,7 +108,6 @@ for i in range (len(header)):
 
 def __volumecheck__ (i, x, count, plate):
     if x/200 < 1:
-        print(i,x)
         plate[count] = i
         count +=1
     else:
@@ -125,3 +127,94 @@ if (len(part_dictionary)+len(reagent_sum) <= 96) == True:
 else:
     print('The sum of the parts and reagents is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
     sys.exit(1)
+
+
+
+
+class PDF(FPDF):
+    def header(self):
+        self.set_font('helvetica','B',20)
+        self.cell(0,10,'Automated MetClo Assembply Plan',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+        self.ln(10)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('helvetica','I',10)
+        self.cell(0,10,f'Page {self.page_no()}/{{nb}}', align ='C')
+
+
+pdf = PDF('P','mm','Letter')
+pdf.set_auto_page_break(auto =True, margin =15)
+pdf.add_page()
+pdf.set_font('helvetica', 'BU', 16)
+pdf.cell(0,10,f'{str(len(assembly_dictionary))} Assemblies',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+pdf.set_font('helvetica','B', 12)
+w4 = (pdf.w)/4.4
+for i in assembly_dictionary:
+    pdf.set_font('helvetica','B', 12)
+    pdf.cell(w4,10,f'Assembly Name: {i}',border = 0,new_x=XPos.RIGHT)
+    pdf.set_font('helvetica','', 12)
+    pdf.cell(w4,10,f'Assembly Size: {str("{:,}".format(int(assembly_dictionary[i][0])))}',border = 0,new_x=XPos.RIGHT)
+    if int(assembly_dictionary[i][0]) > 10000:
+        pdf.cell(w4,10,'(Recommend: Electroporation)',border = 0,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    else:
+        pdf.cell(w4,10,'(Recomend: Heat Shock)',border = 0,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.cell(0,10,f'{len(assembly_dictionary[i][1])} Parts',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    count = 0
+    for j in assembly_dictionary[i][1]:
+        if count <3:
+            pdf.cell(w4,8,j,border = True,new_x=XPos.RIGHT)
+            count +=1
+        else:
+            pdf.cell(w4,8,j,border = True,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            count = 0
+    pdf.cell(0,8,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.cell(0,10,'Reagents',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    for x in reagent_sum:
+        pdf.cell(w4,8,x,border = True,new_x=XPos.RIGHT)
+    pdf.cell(0,8,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.cell(w4,10,'2.0',border = True,new_x=XPos.RIGHT)
+    pdf.cell(w4,10,'0.5',border = True,new_x=XPos.RIGHT)
+    for j in assembly_dictionary[i][-2:]:
+        pdf.cell(w4,10,str(j),border = True,new_x=XPos.RIGHT)
+    pdf.cell(0,15,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+pdf.add_page()
+pdf.set_font('helvetica', 'BU', 16)
+pdf.cell(0,10,f'{str(len(part_dictionary))} Parts',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+pdf.set_font('helvetica','', 12)
+w5 = (pdf.w)/6.6
+pdf.cell(w5+10,10,'Part Name',border = 1,new_x=XPos.RIGHT)
+pdf.cell(w5-10,10,'Size',border = 1,new_x=XPos.RIGHT)
+pdf.cell(w5-10,10,'Conc.',border = 1,new_x=XPos.RIGHT)
+pdf.cell(w5,10,'Times Used',border = 1,new_x=XPos.RIGHT)
+pdf.cell(w5+5,10,'Volume(30fmol)',border = 1,new_x=XPos.RIGHT)
+pdf.cell(w5+5,10,'Total Volume*1.2',border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+count = 0
+for i in part_dictionary:
+    pdf.cell(w5+10,10,i ,border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5-10,10,parts_con_bp[count][2],border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5-10,10,parts_con_bp[count][1],border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5,10,str(part_count[i]),border = 1,new_x=XPos.RIGHT) 
+    pdf.cell(w5+5,10,str(part_dictionary[i][0]),border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5+5,10,str(part_dictionary[i][1]),border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    count += 1
+
+pdf.ln(15)
+pdf.set_font('helvetica', 'BU', 16)
+pdf.cell(0,10,'Reagents Total * 1.25',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+pdf.set_font('helvetica','', 12)
+for i in reagent_sum:
+    pdf.cell(w4,8,i,border = True,new_x=XPos.RIGHT)
+pdf.ln(8)
+for i in reagent_sum:
+    pdf.cell(w4,8,str(reagent_sum[i]),border = True,new_x=XPos.RIGHT)
+#pdf.cell(0,15,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+pdf.add_page()
+
+pdf.set_font('helvetica', 'BU', 16)
+pdf.cell(0,10,'OT2 Set-Up Instructions',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+pdf.set_font('helvetica','BU', 12)
+pdf.cell(0,10,'Materials',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+
+
+pdf.output('pdf_1.pdf')
+
