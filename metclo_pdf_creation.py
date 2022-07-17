@@ -1,38 +1,35 @@
+from fpdf import FPDF
+from fpdf.enums import XPos, YPos
 
-from reportlab.lib.units import inch
-from reportlab.pdfgen.canvas import Canvas
-class pdfcreator:
-    def __init__(self,assembly, parts, reagents):
-        self.allassemblies = assembly
-        self.allparts = parts
-        self.reagents = reagents
+class PDF(FPDF):
+    def header(self):
+        #logo
+        self.image('96well.jpg', 10,8,25)
+        #font
+        self.set_font('helvetica','B',20)
+        #title
+        self.cell(0,10,'Automated MetClo Assembply Plan',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+        #linebreak
+        self.ln(20)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('helvetica','I',10)
+        self.cell(0,10,f'Page {self.page_no()}/{{nb}}', align ='C')
+# create FPDF object
+#Layout('P','L')
+#unit
+#format
+pdf = PDF('P','mm','Letter')
+pdf.set_auto_page_break(auto =True, margin =15)
 
-    def return_assemblies(self):
-        for i in self.allassemblies:
-            print(i)
+#Add a page
+pdf.add_page()
 
-    def createpdf(self):  
-        def form(path):
-            my_canvas = canvas.Canvas(path, pagesize=letter)
-            my_canvas.setLineWidth(.3)
-            my_canvas.setFont('Helvetica', 15)
-            my_canvas.drawString(30, 750, 'INSTRUCTIONS')
-            my_canvas.setFont('Helvetica', 11)
-           # myfile = open("/home/dany/data/software/GitHub/metclo/instructions.txt", "rt")
-           # contents = myfile.read()
-            #myfile.close()  
-            #my_canvas.drawString(30, 735, contents)
-            my_canvas.drawString(30, 750, 'ASSlsEMBLIES')
-            my_canvas.drawString(30, 735, 'PARTS')
-            my_canvas.drawString(30, 720, 'ASSEMBLY PLAN')
-            my_canvas.drawString(30, 705, 'MAP')
-            my_canvas.setFont('Helvetica', 11)
-            my_canvas.drawString(40, 690, 'OT2 BENCH LAYOUT')
-            my_canvas.drawString(40, 675, 'PART & REAGENT 96-WELL-PLATE')
-            my_canvas.drawString(40, 660, 'FALCON TUBES')
-            my_canvas.drawString(40, 645, 'ASSEMBLY PLATE 96-WELL-PLATE')
-            my_canvas.save()
-        if __name__ == '__main__':
-            form('metclo_plan.pdf')
+pdf.set_font('helvetica', 'BU', 16)
+#add text cell or multicell
+#(width, height)
+for i in range(1,41):
+    pdf.cell(0,10,f'This is line {i}:D', border =True, align = 'C')
+    pdf.cell(0,10,f'This is line {i}:D' ,new_x=XPos.LMARGIN,new_y=YPos.NEXT, border =True)
 
-        
+pdf.output('pdf_1.pdf')

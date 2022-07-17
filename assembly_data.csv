@@ -1,4 +1,4 @@
-assembly name,assembly size,parts,bsai,water,heat shock
+assembly name,assembly size,parts,bsai,water
 2frag,21949,"['MpMXBP_pFa', 'pa', 'aq']",0.5,0
 3frag,29494,"['MpMXBP_pFa', 'pa', 'ab', 'bq']",0.5,0
 4frag,37286,"['MpMXBP_pFa', 'pa', 'ab', 'bc', 'cq']",1.0,0

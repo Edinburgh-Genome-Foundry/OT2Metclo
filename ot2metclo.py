@@ -41,16 +41,34 @@ for i in reagent_data:
 for i in part_data:
     plate_position, count = __volumecheck__(i[0],float(i[1]),count, plate_position)
 
+parts_plate = reagent_data + part_data
+partsplate_tvolume= {}
+for i in parts_plate:
+    if len(i) == 2:
+        partsplate_tvolume[i[0]] = i[1]
+    if len(i) > 2:
+        partsplate_tvolume[i[0]] = i[2]
+print(partsplate_tvolume)
+
+
+
+
+
 tcplate_position = {}
 count = 0
 for i in range (len(assembly_data)):
     tcplate_position[i] = assembly_data[i][0]
 
-print('assembly_data\n',assembly_data)
-print('part_data\n',part_data)
-print('reagent_data\n',reagent_data)
-print('plate_position',plate_position)
-print('tcplate_position\n',tcplate_position)
+print('assembly_data')
+for x in assembly_data: print(x) 
+print(type(part_data))
+for x in part_data: print(x)
+print('reagent_data')
+for x in reagent_data: print(x)
+print('plate_position')
+for x in plate_position: print(x)
+print('tcplate_position')
+for x in tcplate_position: print(x)
 
 
 
@@ -91,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ################################################################################
 
 
-    
+    '''
     for i in plate_position:
         a= plate_position[i]
         print(a)
@@ -100,16 +118,13 @@ def run(protocol: protocol_api.ProtocolContext):
             print('reagent')
         if a.startswith('ligase') == True:
             p_20.distribute(0.5,part_plate.wells()[i], [tc_plate.wells()[w] for w in list(tcplate_position.keys())])
-
-    
-
-
     '''
-    for key,v in parts.items():
+
+    for key,v in parts_plate.items():
         n = (list(parts.keys()).index(key))
         p = alpha[n] + '2'
         globals()[key]= part_plate.wells(p)
-
+'''
 
 
 

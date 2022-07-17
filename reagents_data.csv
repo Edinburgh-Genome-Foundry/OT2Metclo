@@ -1,5 +1,7 @@
 reagent,sum
-ligase_buffer,7.5
-ligase,1.875
-bsai,2.5
-water,0.0
+ligase_buffer.1,200
+ligase_buffer.2,200
+ligase_buffer.3,50
+ligase,1.5
+bsai,2.0
+water,0
