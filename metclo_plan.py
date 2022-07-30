@@ -14,7 +14,7 @@ def __countinstances__(uncompressed_parts):
 
 def __calcvolume__(ngul, bp):
     'takes the concentration in ng/ul and sequence lenght of the sample and finds the volume needed containing 30fmol'
-    volume = round(30/((ngul/(1e-6))/(bp*617.96+ 36.04)),3)
+    volume = round(30/(((ngul*1e-9)/((bp*617.69)+36.04))*1e15),3)
     return volume
 
 def __calcreagents__(assembly_size, part_volumes):
@@ -63,32 +63,79 @@ def __volumecheck__ (i, x):
             count +=1
     return plate, wellvolume, count
 
+def __check_part_congruency__(parts_concentration_size, part_count, part_file_name, assembly_file_name):
+# Checks if the parts in the assembly and part files are congruent
+    irregular_parts = []
+    irregular_assembly = {}
+    _check = False
+    for i in parts_concentration_size:
+        try: 
+            n=part_count[i[0]]
+        except: 
+            irregular_parts.append(i[0])
+    for i in part_count:
+        check_ = False
+        for j in parts_concentration_size:
+            if i == j[0]:
+                check_ = True
+        if check_ == False:
+            irregular_assembly[i] = []
+            for k in assemblies:
+                irregular_assembly[i].append(k[0])
 
-    
+    if len(irregular_parts) != 0 :
+        print(part_file_name, ' has parts that are not found in ', assembly_file_name, ':')
+        for i in irregular_parts:
+            print('\t',i)
+        _check = True
+
+    if len(irregular_assembly) != 0 :
+        print(assembly_file_name, ' has assemblies with parts that are not found in ', part_file_name, ':')
+        for i in irregular_assembly:
+            print('\t',i,' found in assemblies ',irregular_assembly[i])
+        _check = True
+
+    if _check == True: sys.exit(1)
+
+#Lists that will collect the .csv information and calculations
 assemblies = []
 uncompressed_parts = []
 parts_concentration_size = []
+
+#Input .csv files 
 assembly_path = '/home/dany/Dropbox/EGF/Metclo/Metclo Simulation/DNA Files/oriFCam/finalassembly.csv'
 part_path = '/home/dany/Dropbox/EGF/Metclo/Metclo Simulation/DNA Files/oriFCam/parts.csv'
 #assembly_path = input('Input Full Pathway of Assembly (.csv):\n')
 #part_path = input('Input Full Pathway of Parts (.csv):\n')
+assembly_file_name = assembly_path.split("/")[-1]
+part_file_name = part_path.split("/")[-1]
 
-#Opening documents
+
+
+#Opening assembly document and extracts its information
+#part_count collects the presence of a part within the all the assemblies
 try:
     with open(assembly_path, newline='') as csvfile:
         assembly_row = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in assembly_row:
             list_row = [ele for ele in ((', '.join(row)).split(',')) if ele.strip()]
             assemblies.append(list_row)
-            for j in list_row:
-                uncompressed_parts.append(j)
+            for j in list_row: 
+                if list_row.index(j) > 1:
+                    uncompressed_parts.append(j)
+        part_count = __countinstances__(uncompressed_parts)
+    # does not fit right because we dont know how mnay wells we need
+    if len(part_count) > 96:
+        print('Too many parts. Max number of parts = 96, given number of parts = '+ str(len(part_count)))
+        sys.exit(1)
     if len(assemblies) > 96:
-        print('Too manny assemblies. Max number of assemblies = 96, <assembly_plan>.csv assemblies = '+ str(len(assemblies)))
+        print('Too many assemblies. Max number of assemblies = 96, ',assembly_file_name ,' assemblies = '+ str(len(assemblies)))
         sys.exit(1)
 except:
-    print('Assembly file error.')
+    print(assembly_file_name, ' error.')
     sys.exit(1)
 
+#Opening part document and extracts the information
 try:
     with open(part_path, newline='') as csvfile:
         part_row = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -96,22 +143,32 @@ try:
             list_row = [ele for ele in ((', '.join(row)).split(',')) if ele.strip()]  
             parts_concentration_size.append(list_row)
 except:
-    print('Part file error.')
+    print(part_file_name,' error.')
     sys.exit(1)
 
-#counting number of parts this doesnt seem right 
-# i feel like i need to combine the reagents and the pasrts because they will share a plate. i need to do this after making the dictionaries
-part_count = __countinstances__(uncompressed_parts)
-if len(part_count) > 96:
-    print('Too manny parts. Max number of parts = 96, given number of parts = '+ str(len(part_count)))
-    sys.exit(1)
+__check_part_congruency__(parts_concentration_size, part_count, part_file_name, assembly_file_name)
+
+print('assemblies\n' , assemblies)
+print('uncompressed_parts\n' ,uncompressed_parts)
+#part count counts tyhe frags and the bp
+print('part count\n' ,part_count)
+print('parts_concentration_size' , parts_concentration_size)
+
+
+
+
+
+
+
 
 #Making part dictionary
 part_dictionary = {}
 for i in part_count:
     for j in parts_concentration_size:
         if i == j[0]:
+            #print((float(j[1]),float(j[2])))
             single_volume = __calcvolume__(float(j[1]),float(j[2]))
+            #print(single_volume)
             total_volume = round(part_count[i]*single_volume*1.2,3)
             #######ERRASE#####
             if j[0] == 'pa':
@@ -120,8 +177,8 @@ for i in part_count:
             plate,wellvolume, count = __volumecheck__(j[0],total_volume)
             for q in range(len(plate)):
                 part_dictionary[plate[q]] = [round(single_volume,3),round(wellvolume[q],3)]
-for x in part_dictionary: print(x, '  ',part_dictionary[x])
 
+print('PART DICTIONARY\n',part_dictionary)
 
 #Making assembly dictionary
 assembly_dictionary = {}
@@ -140,8 +197,9 @@ for i in assemblies:
     part_volume_sum = round(part_volume_sum,3)
     bsai, water = __calcreagents__(int(i[1]),part_volume_sum)
 
-    assembly_dictionary[i[0]] = [i[1],i[2:],bsai, water]
-for x in assembly_dictionary: print (x, '  ', assembly_dictionary[x]) 
+    assembly_dictionary[i[0]] = [i[1],i[2:],2, 0.5,bsai, water]
+
+print('ASSEMBLY DICTIONARY\n', assembly_dictionary)
 
 #Making reagent dictionary
 reagent_dictionary = {}
@@ -166,8 +224,10 @@ for i in reagents:
         plate,wellvolume, count = __volumecheck__(i,total_volume)
     for q in range(len(plate)):
         reagent_dictionary[plate[q]] = [round(wellvolume[q],3)]
-print(reagent_dictionary)
 
+print('REAGENT DICTIONARY\n',reagent_dictionary)
+
+'''
 if (len(part_dictionary)+len(reagent_dictionary) > 96) == True:
     print(f'The sum of the parts and reagents {len(part_dictionary)+len(reagent_dictionary)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
     sys.exit(1)
@@ -178,14 +238,6 @@ data = (assembly_dictionary, part_dictionary, reagent_dictionary)
 
 for i in range (len(header)):
     __makecvs__(doc[i],header[i],data[i])
-
-
-
-
-
-
-
-
 
 
 class PDF(FPDF):
@@ -246,7 +298,7 @@ pdf.cell(w5,10,'Times Used',border = 1,new_x=XPos.RIGHT)
 pdf.cell(w5+5,10,'Volume(30fmol)',border = 1,new_x=XPos.RIGHT)
 pdf.cell(w5+5,10,'Total Volume*1.2',border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 count = 0
-'''for i in part_dictionary:
+#for i in part_dictionary:
     print(i)
     pdf.cell(w5+10,10,i ,border = 1,new_x=XPos.RIGHT)
     pdf.cell(w5-10,10,parts_concentration_size[count][2],border = 1,new_x=XPos.RIGHT)
@@ -254,7 +306,7 @@ count = 0
     #pdf.cell(w5,10,str(part_count[i]),border = 1,new_x=XPos.RIGHT) 
     pdf.cell(w5+5,10,str(part_dictionary[i][0]),border = 1,new_x=XPos.RIGHT)
     pdf.cell(w5+5,10,str(part_dictionary[i][1]),border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    count += 1'''
+    #count += 1
 
 pdf.ln(15)
 pdf.set_font('helvetica', 'BU', 16)
@@ -273,6 +325,11 @@ pdf.cell(0,10,'OT2 Set-Up Instructions',border = False,new_x=XPos.LMARGIN,new_y=
 pdf.set_font('helvetica','BU', 12)
 pdf.cell(0,10,'Materials',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
 
+try: 
+    pdf.output('metclo_plan.pdf')
+    print('metclo_plan.pdf written succesfully.')
+except:
+    print('metclo_plan.pdf not written')
+    sys.exit(1)
 
-pdf.output('pdf_1.pdf')
-
+'''
