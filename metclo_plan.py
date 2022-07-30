@@ -202,29 +202,15 @@ for i in assemblies:
 print('ASSEMBLY DICTIONARY\n', assembly_dictionary)
 
 #Making reagent dictionary
-reagent_dictionary = {}
 reagents = ['ligase_buffer', 'ligase', 'bsai', 'water']
-assembly_count = len(assembly_dictionary) 
-for i in reagents:
-    total_volume=0
-    if i == 'ligase_buffer':
-        total_volume = 2*assembly_count
-        total_volume = 450
-        plate,wellvolume, count = __volumecheck__(i,total_volume)
-    if i == 'ligase':
-        total_volume = 0.5*assembly_count
-        plate,wellvolume, count = __volumecheck__(i,total_volume)
-    if i == 'bsai':
-        for j in assembly_dictionary:
-            total_volume += assembly_dictionary[j][2]
-        plate,wellvolume, count = __volumecheck__(i,total_volume)
-    if i == 'water':
-        for j in assembly_dictionary:
-            total_volume += assembly_dictionary[j][3]
-        plate,wellvolume, count = __volumecheck__(i,total_volume)
-    for q in range(len(plate)):
-        reagent_dictionary[plate[q]] = [round(wellvolume[q],3)]
-
+reagent_dictionary = dict.fromkeys(reagents,0.0)
+for i in assembly_dictionary:
+    reagent_dictionary['ligase_buffer'] += assembly_dictionary[i][2] 
+    reagent_dictionary['ligase'] += assembly_dictionary[i][3] 
+    reagent_dictionary['bsai'] += assembly_dictionary[i][4] 
+    reagent_dictionary['water'] += assembly_dictionary[i][5] 
+for i in reagent_dictionary:
+    reagent_dictionary[i] = round(reagent_dictionary[i]*1.2,3) 
 print('REAGENT DICTIONARY\n',reagent_dictionary)
 
 '''
