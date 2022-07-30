@@ -26,7 +26,6 @@ def __calcreagents__(assembly_size, part_volumes):
     return bsai, water
 
 def __makecvs__(doc, header, data):
-    
     with open(doc,'w') as f:
         writer = csv.writer(f)
         writer.writerow(header)
@@ -38,7 +37,7 @@ def __makecvs__(doc, header, data):
                 writer.writerow(row)
         except: 
             for i in data:
-                row = [i, reagent_sum[i]]
+                row = [i, data[i]]
                 writer.writerow(row)
     print(doc,' written succesfully.')
 
@@ -124,10 +123,6 @@ try:
                 if list_row.index(j) > 1:
                     uncompressed_parts.append(j)
         part_count = __countinstances__(uncompressed_parts)
-    # does not fit right because we dont know how mnay wells we need
-    if len(part_count) > 96:
-        print('Too many parts. Max number of parts = 96, given number of parts = '+ str(len(part_count)))
-        sys.exit(1)
     if len(assemblies) > 96:
         print('Too many assemblies. Max number of assemblies = 96, ',assembly_file_name ,' assemblies = '+ str(len(assemblies)))
         sys.exit(1)
@@ -213,18 +208,18 @@ for i in reagent_dictionary:
     reagent_dictionary[i] = round(reagent_dictionary[i]*1.2,3) 
 print('REAGENT DICTIONARY\n',reagent_dictionary)
 
-'''
+
 if (len(part_dictionary)+len(reagent_dictionary) > 96) == True:
-    print(f'The sum of the parts and reagents {len(part_dictionary)+len(reagent_dictionary)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
+    print(f'The sum of the parts and reagents wells needed {len(part_dictionary)+len(reagent_dictionary)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
     sys.exit(1)
 
-header = [['assembly name','assembly size', 'parts', 'bsai','water'],['part name', 'single', 'sum'],['reagent', 'sum']]
+header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2']]
 doc = ['assembly_data.csv','part_data.csv','reagents_data.csv']
 data = (assembly_dictionary, part_dictionary, reagent_dictionary)
 
 for i in range (len(header)):
     __makecvs__(doc[i],header[i],data[i])
-
+'''
 
 class PDF(FPDF):
     def header(self):
