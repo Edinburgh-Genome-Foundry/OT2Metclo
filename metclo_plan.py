@@ -193,8 +193,6 @@ for i in assembly_dictionary:
     reagent_dictionary['water'] += assembly_dictionary[i][5] 
 for i in reagent_dictionary:
     reagent_dictionary[i] = round(reagent_dictionary[i]*1.2,3) 
-print('REAGENT DICTIONARY\n',reagent_dictionary)
-
 
 if (len(part_dictionary)+len(reagent_dictionary) > 96) == True:
     print(f'The sum of the parts and reagents wells needed {len(part_dictionary)+len(reagent_dictionary)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
