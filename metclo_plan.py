@@ -374,6 +374,8 @@ __PDFsubtitle__('Reagent Plate Layout (ul)')
 __PDFreagent_partplate__(reagent_dictionary, part_dictionary)
 __PDFsubtitle__('Thermocycler Plate with Assemblies')
 __PDFtmcplate__(assembly_dictionary)
+__PDFsubtitle__('OT2 Layout')
+pdf.image('OT2bench.jpeg',45,50,150)
 
 
 try: 
