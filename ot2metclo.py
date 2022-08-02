@@ -14,17 +14,18 @@ def __openfile__(file):
                     data.append(j)
                 return data
     except:
-        print('File error.')
+        print('File error.',file)
         sys.exit(1)
 
 def __volumecheck__ (i, x, count, plate):
     if x/200 < 1:
-        plate[count] = i
+        plate[count] = [i[0], float(i[1])]
         count +=1
     else:
         wells = math.ceil(x/200)
         for t in range (wells):
-            plate[count] = i+ '.'+str(t+1)
+            plate[count] = [i[0]+ '.'+str(t+1), float(i[1])]
+            
             count +=1
     return plate, count
 
@@ -41,45 +42,89 @@ def __makeplate__ ():
 assembly_data =  __openfile__('assembly_data.csv')
 part_data = __openfile__('part_data.csv')
 reagent_data = __openfile__('reagents_data.csv')
-print('ASSEMBLY DATA\n', assembly_data)
-print('PART DATA\n', part_data)
-print('REAGENT DATA\n', reagent_data)
+position_data = __openfile__('position_data.csv')
+#print('ASSEMBLY DATA\n', assembly_data)
+#print('\nPART DATA\n', part_data)
+#print('\nREAGENT DATA\n', reagent_data)
 
-
-
-plate_position = {}
+reagent_part_plate = {}
+reagent_part_plate2 = {}
+assembly_plate = {}
 count = 0
-for i in reagent_data:
-    plate_position, count = __volumecheck__(i[0],float(i[1]),count, plate_position)
+for i in position_data:
+    if len(i) ==3:
+        reagent_part_plate[i[0]] = i[1:]
+        reagent_part_plate2[i[1]] = [i[0],i[2]]
+    else:
+        reagent_part_plate[i[0]] = []
+    try:
+        assembly_plate [i[0]] = [assembly_data[count][0],0]
+        count +=1
+    except:
+        assembly_plate [i[0]] = ['',0]
+
+assembly_dictionary = {}
+for i in assembly_data:
+    parts_ =[]
+    for t in (i[2][1:-1]).split(","):
+        t=(t.strip(' '))[1:-1]
+        parts_.append(t)
+    assembly_dictionary[i[0]] = parts_,i[3:]
+
+part_dictionary ={}
 for i in part_data:
-    plate_position, count = __volumecheck__(i[0],float(i[1]),count, plate_position)
-
-parts_plate = reagent_data + part_data
-
-partsplate_tvolume= {}
-count = 0
-for i in parts_plate:
-    if len(i) == 2:
-        partsplate_tvolume[i[1]] = count
-        count += 1
-    if len(i) > 2:
-        partsplate_tvolume[i[2]] = count
-        count += 1
+    part_dictionary[i[0]] = i[1]
 
 
+print('REAGENT_PART_PLATE2\n',reagent_part_plate2)
 
+print('ASSEMBLY_DICTIONARY' , assembly_dictionary)
+print('PART_DICTIONARY' , part_dictionary)
+print('\nREAGENT_PART_PLATE\n',reagent_part_plate, '\n')
+print('\nASSEMBLY_PLATE\n',assembly_plate)
 
+reagents = ['ligase_buffer', 'ligase', 'bsai', 'water']
 
-tcplate_position = {}
-for i in range (len(assembly_data)):
-    tcplate_position[assembly_data[i][0]] = i
+for i in assembly_plate:
+    if assembly_plate[i][0] != '':
+        assembly_name = assembly_plate[i][0]
+        parts = assembly_dictionary[assembly_name][0]
+        assembly_location = i
+        reagent_dictionary = {}
+        for j in range(len(assembly_dictionary[assembly_name][1])):        
+            reagent_dictionary[reagents[j]] = assembly_dictionary[assembly_name][1][j]
+        print('\nASSEMBLY_NAME', assembly_name)
+        print('PARTS',parts)
+        print('REAGENT_DICTIONARY', reagent_dictionary,'\n')
+        for j in reagent_dictionary:
+            print(j)
+            try: 
+                if reagent_part_plate2[j][1] != 0 and float(reagent_part_plate2[j][1]) > float(reagent_dictionary[j]):
+                    print('TRY')
+                    print(float(reagent_part_plate2[j][1]),float(reagent_dictionary[j]))
+                    print('transfer', reagent_dictionary[j], ' from ', reagent_part_plate2[j][0], 'to', i , 'on assembly plate' )
+                    print(reagent_part_plate2[j][1], type(reagent_part_plate2[j][1]),'-',reagent_dictionary[j] , type(reagent_dictionary[j]))
+                    reagent_part_plate2[j][1] =float(reagent_part_plate2[j][1]) - float(reagent_dictionary[j])
+                    print('TRY2\n')
+            except:
+                print('EXCEPT')
+                check= False
+                for k in reagent_part_plate2:
+                    val = reagent_part_plate2[k]
+                    k_ = k.split('.')[0]
 
+                    if k_ == j and val != 0 and check ==False and float(reagent_dictionary[k_])!=0 and float(reagent_part_plate2[k][1]) > float(reagent_dictionary[j]) :
+                        print('$$$$$$',float(reagent_part_plate2[k][1]) , float(reagent_dictionary[j]) )
+                        print('transfer', reagent_dictionary[j], ' from ', reagent_part_plate2[k][0], 'to', i , 'on assembly plate' )
+                        print(reagent_part_plate2[k][1], type(reagent_part_plate2[k][1]),'-',reagent_dictionary[j] , type(reagent_dictionary[j]),'\n')
+                        reagent_part_plate2[k][1]=float(reagent_part_plate2[k][1]) - float(reagent_dictionary[j])
+                        check = True
+        # make j for parts
+                        
+                        
 
-
-
-print('PLATE POSITION\n', plate_position)
-print(partsplate_tvolume)
-print('££tc plate',tcplate_position)
+        
+print('REAGENT_PART_PLATE2\n',reagent_part_plate2)
 
 
 metadata = {
@@ -110,17 +155,18 @@ def run(protocol: protocol_api.ProtocolContext):
     p_20 = protocol.load_instrument('p20_single_gen2', 'left', tip_racks=[tr_20])
     p_300 = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tr_300])
 
-    for i in assembly_data:
-        #ligasebuffer
-        p_20.transfer(int(i[3]),  )
-        p_20.transfer(5, part_plate.wells()[i],tc_plate.wells()[i])
+
+    #for i in assembly_plate:
+    #    assembly_name = assembly_plate[i][0]
+    #    print(assembly_name)
+        
 
 ################################################################################
 # REAGENTS
 ################################################################################
 
 
-    '''
+'''
     for i in plate_position:
         a= plate_position[i]
         print(a)

@@ -97,6 +97,25 @@ def __check_part_congruency__(parts_concentration_size, part_count, part_file_na
 
     if _check == True: sys.exit(1)
 
+def __plate_dictionary_creator__ (reagent_total, part_dictionary):
+    alpha = list(string.ascii_uppercase)[:8]
+    plate_dictionary = {}
+    reagent_list = list(reagent_total.items())
+    part_list = list(part_dictionary.items())
+    count =0 
+    for j in range(12):
+        for i in range(8):
+            plate_dictionary[alpha[i]+str(j+1)]= ''
+    for i in plate_dictionary:
+        if count < len(reagent_list):
+            plate_dictionary[i] = reagent_list[count]
+            count +=1
+    count = 0
+    for i in plate_dictionary:
+        if plate_dictionary[i] =='' and count < len(part_list):
+            plate_dictionary[i] = part_list[count][0], part_list[count][1][1]
+            count +=1
+    return plate_dictionary
 #Lists that will collect the .csv information and calculations
 assemblies = []
 uncompressed_parts = []
@@ -185,22 +204,30 @@ for i in assemblies:
 
 #Making reagent dictionary
 reagents = ['ligase_buffer', 'ligase', 'bsai', 'water']
-reagent_dictionary = dict.fromkeys(reagents,0.0)
+reagent_total = dict.fromkeys(reagents,0.0)
+reagent_dictionary = {}
+many_wells_reagents = {}
 for i in assembly_dictionary:
-    reagent_dictionary['ligase_buffer'] += assembly_dictionary[i][2] 
-    reagent_dictionary['ligase'] += assembly_dictionary[i][3] 
-    reagent_dictionary['bsai'] += assembly_dictionary[i][4] 
-    reagent_dictionary['water'] += assembly_dictionary[i][5] 
-for i in reagent_dictionary:
-    reagent_dictionary[i] = round(reagent_dictionary[i]*1.2,3) 
+    reagent_total['ligase_buffer'] += assembly_dictionary[i][2] 
+    reagent_total['ligase'] += assembly_dictionary[i][3] 
+    reagent_total['bsai'] += assembly_dictionary[i][4] 
+    reagent_total['water'] += assembly_dictionary[i][5] 
+reagent_total['water'] = 450
+for i in reagent_total:
+    reagent_total[i] = round(reagent_total[i]*1.2,3)
+    plate,wellvolume, count = __volumecheck__(i,reagent_total[i])
+    for q in range(len(plate)):
+        reagent_dictionary[plate[q]] = round(wellvolume[q],3)
 
-if (len(part_dictionary)+len(reagent_dictionary) > 96) == True:
-    print(f'The sum of the parts and reagents wells needed {len(part_dictionary)+len(reagent_dictionary)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
+if (len(part_dictionary)+len(reagent_total) > 96) == True:
+    print(f'The sum of the parts and reagents wells needed {len(part_dictionary)+len(reagent_total)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
     sys.exit(1)
 
-header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2']]
-doc = ['assembly_data.csv','part_data.csv','reagents_data.csv']
-data = (assembly_dictionary, part_dictionary, reagent_dictionary)
+plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
+
+header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2'], ['position', 'solution', 'well volume']]
+doc = ['assembly_data.csv','part_data.csv','reagents_data.csv', 'position_data.csv']
+data = (assembly_dictionary, part_dictionary, reagent_dictionary, plate_dictionary)
 
 for i in range (len(header)):
     __makecvs__(doc[i],header[i],data[i])
@@ -251,7 +278,7 @@ def __PDFassembly__(i):
     pdf.set_font('helvetica','B', 12)
     pdf.cell(0,8,'Reagents (ul)',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
     pdf.set_font('helvetica','', 12)
-    for x in reagent_dictionary:
+    for x in reagent_total:
         pdf.cell(w4,6,x,border = True,new_x=XPos.RIGHT)
     pdf.cell(0,6,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
     for j in assembly_dictionary[i][-4:]:
@@ -280,32 +307,15 @@ def __PDFparts__(part_dictionary, parts_concentration_size,part_count):
                 else:
                     pdf.cell(w5+5,10,str(part_dictionary[i][0]),border = 1,new_x=XPos.RIGHT)
                     pdf.cell(w5+5,10,str(part_dictionary[i][1]),border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-def __PDFreagents__(reagent_dictionary):
+def __PDFreagents__(reagent_total):
     w4 = (pdf.w)/4.4
-    for i in reagent_dictionary:
+    for i in reagent_total:
         pdf.cell(w4,8,i,border = True,new_x=XPos.RIGHT)
     pdf.ln(8)
-    for i in reagent_dictionary:
-        pdf.cell(w4,8,str(reagent_dictionary[i]),border = True,new_x=XPos.RIGHT)
-def __PDFreagent_partplate__(reagent_dictionary, part_dictionary):
-    alpha = list(string.ascii_uppercase)[:8]
-    plate_dictionary = {}
-    reagent_list = list(reagent_dictionary.items())
-    part_list = list(part_dictionary.items())
+    for i in reagent_total:
+        pdf.cell(w4,8,str(reagent_total[i]),border = True,new_x=XPos.RIGHT)
+def __PDFreagent_partplate__(plate_dictionary):
     w4 = (pdf.w)/4.4
-    count =0 
-    for j in range(12):
-        for i in range(8):
-            plate_dictionary[alpha[i]+str(j+1)]= ''
-    for i in plate_dictionary:
-        if count < len(reagent_list):
-            plate_dictionary[i] = reagent_list[count]
-            count +=1
-    count = 0
-    for i in plate_dictionary:
-        if plate_dictionary[i] =='' and count < len(part_list):
-            plate_dictionary[i] = part_list[count][0], part_list[count][1][1]
-            count +=1
     count = 0
     pdf.set_font('helvetica','', 8)
     for i in plate_dictionary:
@@ -365,11 +375,11 @@ for i in assembly_dictionary:
     __PDFassembly__(i)
 __PDFtitle__(f'{str(len(part_dictionary))} Parts')
 __PDFparts__(part_dictionary, parts_concentration_size,part_count)
-__PDFtitle__(f'Total Reagents Volumes Required (ul)')
-__PDFreagents__(reagent_dictionary)
+__PDFtitle__(f'Total Reagents Volumes Required (ul) *1.2')
+__PDFreagents__(reagent_total)
 __PDFtitle__(f'OT2 Set-Up Instructions')
 __PDFsubtitle__('Reagent Plate Layout (ul)')
-__PDFreagent_partplate__(reagent_dictionary, part_dictionary)
+__PDFreagent_partplate__(plate_dictionary)
 __PDFsubtitle__('Thermocycler Plate with Assemblies')
 __PDFtmcplate__(assembly_dictionary)
 __PDFsubtitle__('OT2 Layout')
