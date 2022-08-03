@@ -173,10 +173,6 @@ for i in part_count:
             single_volume = __calcvolume__(float(j[1]),float(j[2]))
             #print(single_volume)
             total_volume = round(part_count[i]*single_volume*1.2,3)
-            #######ERRASE#####
-            if j[0] == 'pa':
-                total_volume = 420
-            ##################
             plate,wellvolume, count = __volumecheck__(j[0],total_volume)
             if len(plate)>1:
                 many_wells_parts[j[0]]= [len(plate),round(single_volume,3),sum(wellvolume)]
@@ -212,7 +208,6 @@ for i in assembly_dictionary:
     reagent_total['ligase'] += assembly_dictionary[i][3] 
     reagent_total['bsai'] += assembly_dictionary[i][4] 
     reagent_total['water'] += assembly_dictionary[i][5] 
-reagent_total['water'] = 450
 for i in reagent_total:
     reagent_total[i] = round(reagent_total[i]*1.2,3)
     plate,wellvolume, count = __volumecheck__(i,reagent_total[i])

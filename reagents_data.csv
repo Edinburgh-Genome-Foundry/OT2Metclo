@@ -2,6 +2,4 @@ reagent,sum*1.2
 ligase_buffer,7.2
 ligase,1.8
 bsai,2.4
-water.1,200
-water.2,200
-water.3,140.0
+water,1.807
