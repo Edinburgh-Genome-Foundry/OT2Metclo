@@ -6,18 +6,19 @@ import sys
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
-
+#Counts the instances a part is used throughout all assemblies
 def __countinstances__(uncompressed_parts):
     count_parts = {}
     for i in uncompressed_parts:
         count_parts[i] = uncompressed_parts.count(i)
     return count_parts
 
+#Calculates the volume with 30fmol of parts.
 def __calcvolume__(ngul, bp):
-    'takes the concentration in ng/ul and sequence lenght of the sample and finds the volume needed containing 30fmol'
     volume = round(30/(((ngul*1e-9)/((bp*617.69)+36.04))*1e15),3)
     return volume
 
+#Provides the bsai and water volume unique to each assembly
 def __calcreagents__(assembly_size, part_volumes):
     ligase_buffer = 2.0
     ligase = 0.5
@@ -26,6 +27,7 @@ def __calcreagents__(assembly_size, part_volumes):
     water = round(20 - sum_parts,3) if sum_parts < 20 else 0 
     return bsai, water
 
+#Makes .csv files, as inputs for the opentron protocol
 def __makecvs__(doc, header, data):
     with open(doc,'w') as f:
         writer = csv.writer(f)
@@ -42,6 +44,8 @@ def __makecvs__(doc, header, data):
                 writer.writerow(row)
     print(doc,' written succesfully.')
 
+#The maximum volume within the reagent plate is 200ul.
+#The method checks if the volume needed is over 200ul, if so, the volume is devided into different wells
 def __volumecheck__ (i, x):
     wellvolume = []
     plate = []
@@ -63,8 +67,8 @@ def __volumecheck__ (i, x):
             count +=1
     return plate, wellvolume, count
 
+#Checks if the parts within the two files are congruent with eachother
 def __check_part_congruency__(parts_concentration_size, part_count, part_file_name, assembly_file_name):
-# Checks if the parts in the assembly and part files are congruent
     irregular_parts = []
     irregular_assembly = {}
     _check = False
@@ -97,6 +101,7 @@ def __check_part_congruency__(parts_concentration_size, part_count, part_file_na
 
     if _check == True: sys.exit(1)
 
+#Creates a dictionary with the well-identifier as a key, and 
 def __plate_dictionary_creator__ (reagent_total, part_dictionary):
     alpha = list(string.ascii_uppercase)[:8]
     plate_dictionary = {}
@@ -116,7 +121,8 @@ def __plate_dictionary_creator__ (reagent_total, part_dictionary):
             plate_dictionary[i] = part_list[count][0], part_list[count][1][1]
             count +=1
     return plate_dictionary
-#Lists that will collect the .csv information and calculations
+
+#Collect the .csv data and other calculations
 assemblies = []
 uncompressed_parts = []
 parts_concentration_size = []
@@ -131,18 +137,19 @@ part_file_name = part_path.split("/")[-1]
 
 
 
-#Opening assembly document and extracts its information
-#part_count collects the presence of a part within the all the assemblies
+#Opens assembly file and extracts its information
 try:
     with open(assembly_path, newline='') as csvfile:
         assembly_row = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in assembly_row:
             list_row = [ele for ele in ((', '.join(row)).split(',')) if ele.strip()]
             assemblies.append(list_row)
+            #A single part can be used in multiple assemblies, these are counted and stored.
             for j in list_row: 
                 if list_row.index(j) > 1:
                     uncompressed_parts.append(j)
         part_count = __countinstances__(uncompressed_parts)
+    #The number of assemblies is checked, as the plate is limited to 96 assemblies.
     if len(assemblies) > 96:
         print('Too many assemblies. Max number of assemblies = 96, ',assembly_file_name ,' assemblies = '+ str(len(assemblies)))
         sys.exit(1)
@@ -150,7 +157,7 @@ except:
     print(assembly_file_name, ' error.')
     sys.exit(1)
 
-#Opening part document and extracts the information
+#Opening part document and extracts its information
 try:
     with open(part_path, newline='') as csvfile:
         part_row = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -161,17 +168,17 @@ except:
     print(part_file_name,' error.')
     sys.exit(1)
 
+#checks that the parts within the assembly file are present in the partfile and vice versa
 __check_part_congruency__(parts_concentration_size, part_count, part_file_name, assembly_file_name)
 
-#Making part dictionary
+#Makes part dictionary containg the volume (30fmol) need for a single assembly and the total volume thoughtout all assemblues *1.2
+#Makes a dictionary containing the parts that have over 200 ul. It includes the number of wells, a single (30fmol) volume and the total volume thoughtout all assemblues *1.2
 part_dictionary = {}
 many_wells_parts = {}
 for i in part_count:
     for j in parts_concentration_size:
         if i == j[0]:
-            #print((float(j[1]),float(j[2])))
             single_volume = __calcvolume__(float(j[1]),float(j[2]))
-            #print(single_volume)
             total_volume = round(part_count[i]*single_volume*1.2,3)
             plate,wellvolume, count = __volumecheck__(j[0],total_volume)
             if len(plate)>1:
@@ -179,7 +186,7 @@ for i in part_count:
             for q in range(len(plate)):
                 part_dictionary[plate[q]] = [round(single_volume,3),round(wellvolume[q],3)]
 
-#Making assembly dictionary
+#Making assembly dictionary containing the size of the assembly, assembly parts, and volumes of the reagents unique to the assembly
 assembly_dictionary = {}
 for i in assemblies:
     part_volume_sum = 0
@@ -195,10 +202,9 @@ for i in assemblies:
             part_volume_sum += round(volume,3)
     part_volume_sum = round(part_volume_sum,3)
     bsai, water = __calcreagents__(int(i[1]),part_volume_sum)
-
     assembly_dictionary[i[0]] = [i[1],i[2:],2, 0.5,bsai, water]
 
-#Making reagent dictionary
+#Making reagent dictionary containing the total volume needed for all the assemblies *1.2
 reagents = ['ligase_buffer', 'ligase', 'bsai', 'water']
 reagent_total = dict.fromkeys(reagents,0.0)
 reagent_dictionary = {}
@@ -214,16 +220,19 @@ for i in reagent_total:
     for q in range(len(plate)):
         reagent_dictionary[plate[q]] = round(wellvolume[q],3)
 
+#the number of wells needed for the parts and the reagents need to be less than 96
 if (len(part_dictionary)+len(reagent_total) > 96) == True:
     print(f'The sum of the parts and reagents wells needed {len(part_dictionary)+len(reagent_total)}is greater than 96. The parts and reagents will not fit in the 96-well plate. Reduce the number of assemblies.')
     sys.exit(1)
-
-plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
+else:
+    #creates a dictionary that allocates a well to the reagents and parts
+     plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
 
 header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2'], ['position', 'solution', 'well volume']]
 doc = ['assembly_data.csv','part_data.csv','reagents_data.csv', 'position_data.csv']
 data = (assembly_dictionary, part_dictionary, reagent_dictionary, plate_dictionary)
 
+#makes the .csv input for the opentrons protocol
 for i in range (len(header)):
     __makecvs__(doc[i],header[i],data[i])
 
@@ -256,7 +265,6 @@ def __PDFassembly__(i):
     if int(assembly_dictionary[i][0]) > 10000:protocol = 'Electroporation'
     else:protocol = 'Heat Shock'
     pdf.cell(w4,6,f'(Recomend: {protocol})',border = 0,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
-    
     pdf.set_font('helvetica','B', 12)
     pdf.cell(0,6,f'{len(assembly_dictionary[i][1])} Parts',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
     pdf.set_font('helvetica','', 12)
