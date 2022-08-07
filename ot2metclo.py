@@ -54,7 +54,6 @@ count = 0
 for i in position_data:
     if len(i) ==3:
         reagent_part_plate2[i[1]] = [i[0],float(i[2])]
-
     try:
         assembly_plate [i[0]] = [assembly_data[count][0],0]
         count +=1
@@ -78,10 +77,9 @@ for i in part_data:
 
 
 
-
 #print('ASSEMBLY_DICTIONARY' , assembly_dictionary)
 #print('PART_DICTIONARY' , part_dictionary)
-print('\nREAGENT_PART_PLATE2\n',reagent_part_plate2, '\n')
+#print('\nREAGENT_PART_PLATE2\n',reagent_part_plate2, '\n')
 #print('\nASSEMBLY_PLATE\n',assembly_plate)
 
 reagents = ['ligase_buffer', 'ligase', 'bsai', 'water']
@@ -106,23 +104,18 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # Labware
     tr_20 = protocol.load_labware('opentrons_96_tiprack_20ul', 9)
-    tr_300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
-    part_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 2)
+    part_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 6)
     tc_plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
-    falcon = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical',5)
     
     # Instrument
     p_20 = protocol.load_instrument('p20_single_gen2', 'left', tip_racks=[tr_20])
-    p_300 = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tr_300])
-
 
 ################################################################################
-# REAGENTS
+# PROTOCOL
 ################################################################################
     tc_mod.set_lid_temperature(4) 
     tc_mod.set_block_temperature(4)
     tc_mod.open_lid()
-
 
     for i in assembly_plate:
         if assembly_plate[i][0] != '':
@@ -131,46 +124,44 @@ def run(protocol: protocol_api.ProtocolContext):
             reagent_dictionary = {}
             for j in range(len(assembly_dictionary[assembly_name][1])):        
                 reagent_dictionary[reagents[j]] = assembly_dictionary[assembly_name][1][j]
-            print('\nASSEMBLY_NAME', assembly_name)
-            print('PARTS',parts)
-            print('REAGENT_DICTIONARY', reagent_dictionary,'\n')
+            #print('\nASSEMBLY_NAME', assembly_name)
+            #print('PARTS',parts)
+            #print('REAGENT_DICTIONARY', reagent_dictionary,'\n')
             for j in reagent_dictionary:
-                if j in reagent_part_plate2: 
+                if j in reagent_part_plate2:
                     if reagent_part_plate2[j][1] != 0 and reagent_part_plate2[j][1] > reagent_dictionary[j]:
-                        print('transfer', reagent_dictionary[j],j, ' from ', reagent_part_plate2[j][0],'[',reagent_part_plate2[j][1], '] to', i , 'on assembly plate' )
+                        #print('transfer', reagent_dictionary[j],j, ' from ', reagent_part_plate2[j][0],'[',reagent_part_plate2[j][1], '] to', i , 'on assembly plate' )
                         p_20.transfer(reagent_dictionary[j],part_plate[reagent_part_plate2[j][0]], tc_plate[i])
                         reagent_part_plate2[j][1] = round(reagent_part_plate2[j][1] - reagent_dictionary[j],3)
+                    
                 else:
                     check= False
                     for k in reagent_part_plate2:
-                        val = reagent_part_plate2[k]
-                        k_ = k.split('.')[0]
-                        if k_ == j and val != 0 and check ==False and reagent_dictionary[k_]!=0 and reagent_part_plate2[k][1] > reagent_dictionary[j] :
-                            print('transfer', reagent_dictionary[j],j, ' from ', reagent_part_plate2[k][0],'[',reagent_part_plate2[k][1], '] to', i , 'on assembly plate' )
-                            reagent_part_plate2[k][1]=round(reagent_part_plate2[k][1] - reagent_dictionary[j],3)
-                            check = True
-                
+                        if check == False:
+                            val = reagent_part_plate2[k]
+                            k_ = k.split('.')[0]
+                            if k_ == j and val != 0 and check ==False and reagent_dictionary[k_]!=0 and reagent_part_plate2[k][1] > reagent_dictionary[j] :
+                                #print('transfer', reagent_dictionary[j],j, ' from ', reagent_part_plate2[k][0],'[',reagent_part_plate2[k][1], '] to', i , 'on assembly plate' )
+                                p_20.transfer(reagent_dictionary[j],part_plate[reagent_part_plate2[k][0]], tc_plate[i])
+                                reagent_part_plate2[k][1]=round(reagent_part_plate2[k][1] - reagent_dictionary[j],3)
+                                check = True     
             for j in parts:
                 if j in part_dictionary:
-                    print('transfer', part_dictionary[j],j, ' from ', reagent_part_plate2[j][0],'[',reagent_part_plate2[j][1], '] to', i , 'on assembly plate' )
+                    #print('transfer', part_dictionary[j],j, ' from ', reagent_part_plate2[j][0],'[',reagent_part_plate2[j][1], '] to', i , 'on assembly plate' )
+                    p_20.transfer(part_dictionary[j],part_plate[reagent_part_plate2[j][0]], tc_plate[i])
                     reagent_part_plate2[j][1] = round(reagent_part_plate2[j][1] - part_dictionary[j],3)
                 else:
                     check = False
-                    for k in reagent_part_plate2:
-                        k_ = k.split('.')[0]
-                        val = part_dictionary[k]
-                        total = reagent_part_plate2[k][1]
-                        if k_ == j and check == False and val != 0 and total > val:
-                            print('transfer', val,j, ' from ', reagent_part_plate2[k][0],'[',reagent_part_plate2[k][1], '] to', i , 'on assembly plate' )
-                            reagent_part_plate2[k][1] = round(reagent_part_plate2[k][1] - val,3)
-                            check = True
-
-
-
-
-
-
-
+                    for k in part_dictionary:
+                        if check ==False:
+                            k_ = k.split('.')[0]
+                            val = part_dictionary[k]
+                            total = reagent_part_plate2[k][1]
+                            if k_ == j and check == False and val != 0 and total > val:
+                                #print('transfer', val,j, ' from ', reagent_part_plate2[k][0],'[',reagent_part_plate2[k][1], '] to', i , 'on assembly plate' )
+                                p_20.transfer(val,part_plate[reagent_part_plate2[k][0]], tc_plate[i])
+                                reagent_part_plate2[k][1] = round(reagent_part_plate2[k][1] - val,3)
+                                check = True
 
 
 #Thermocycler
@@ -188,3 +179,4 @@ def run(protocol: protocol_api.ProtocolContext):
     tc_mod.set_lid_temperature(4) 
     tc_mod.set_block_temperature(4)
     protocol.comment('Metclo assembly done. Assembly is incubating at 4 degrees Celsius.')
+

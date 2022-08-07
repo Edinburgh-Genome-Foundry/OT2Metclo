@@ -1,7 +1,4 @@
 import csv, math, string
-from posixpath import split
-from sre_constants import SUCCESS
-import numpy as np
 import sys
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -181,6 +178,11 @@ for i in part_count:
         if i == j[0]:
             single_volume = __calcvolume__(float(j[1]),float(j[2]))
             total_volume = round(part_count[i]*single_volume*1.2,3)
+            #############
+            #############
+            #if i == 'bq': total_volume = 690
+            #############
+            #############
             plate,wellvolume, count = __volumecheck__(j[0],total_volume)
             if len(plate)>1:
                 many_wells_parts[j[0]]= [len(plate),round(single_volume,3),sum(wellvolume)]
@@ -217,7 +219,13 @@ for i in assembly_dictionary:
     reagent_total['water'] += assembly_dictionary[i][5] 
 for i in reagent_total:
     reagent_total[i] = round(reagent_total[i]*1.2,3)
+    #############
+    #############
+    #if i =='bsai': reagent_total[i] = 1700
+    #############
+    #############
     plate,wellvolume, count = __volumecheck__(i,reagent_total[i])
+
     for q in range(len(plate)):
         reagent_dictionary[plate[q]] = round(wellvolume[q],3)
 
@@ -400,4 +408,5 @@ try:
 except:
     print('metclo_plan.pdf not written')
     sys.exit(1)
+
 
