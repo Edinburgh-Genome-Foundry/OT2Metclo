@@ -128,8 +128,10 @@ uncompressed_parts = []
 parts_concentration_size = []
 
 #Input .csv files 
-assembly_path = '/home/dany/Dropbox/EGF/Metclo/Metclo Simulation/DNA Files/oriFCam/finalassembly.csv'
-part_path = '/home/dany/Dropbox/EGF/Metclo/Metclo Simulation/DNA Files/oriFCam/parts.csv'
+#examples
+assembly_path = 'example/finalassembly.csv'
+part_path = 'example/parts.csv'
+
 #assembly_path = input('Input Full Pathway of Assembly (.csv):\n')
 #part_path = input('Input Full Pathway of Parts (.csv):\n')
 assembly_file_name = assembly_path.split("/")[-1]
@@ -373,6 +375,14 @@ def __PDFtmcplate__(assembly_dictionary):
 
 
 pdf = PDF('P','mm','Letter')
+
+__PDFtitle__(f'OT2 Set-Up Instructions')
+__PDFsubtitle__('Reagent Plate Layout (ul)')
+__PDFreagent_partplate__(plate_dictionary)
+__PDFsubtitle__('Thermocycler Plate with Assemblies')
+__PDFtmcplate__(assembly_dictionary)
+__PDFsubtitle__('OT2 Layout')
+pdf.image('doc/OT2bench.JPG',45,50,150)
 __PDFtitle__(f'{str(len(assembly_dictionary))} Assemblies')
 for i in assembly_dictionary:
     __PDFassembly__(i)
@@ -380,13 +390,8 @@ __PDFtitle__(f'{str(len(part_dictionary))} Parts')
 __PDFparts__(part_dictionary, parts_concentration_size,part_count)
 __PDFtitle__(f'Total Reagents Volumes Required (ul) *1.2')
 __PDFreagents__(reagent_total)
-__PDFtitle__(f'OT2 Set-Up Instructions')
-__PDFsubtitle__('Reagent Plate Layout (ul)')
-__PDFreagent_partplate__(plate_dictionary)
-__PDFsubtitle__('Thermocycler Plate with Assemblies')
-__PDFtmcplate__(assembly_dictionary)
-__PDFsubtitle__('OT2 Layout')
-pdf.image('OT2bench.jpeg',45,50,150)
+
+
 
 
 try: 
