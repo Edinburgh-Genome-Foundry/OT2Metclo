@@ -1,0 +1,4 @@
+assembly name,assembly size,parts,ligase buffer,DNA ligase,bsai,water
+2frag,21949,"['MpMXBP_pFa', 'pa', 'aq']",2,0.5,0.5,1.506
+3frag,29494,"['MpMXBP_pFa', 'pa', 'ab', 'bq']",2,0.5,0.5,0
+4frag,37286,"['MpMXBP_pFa', 'pa', 'ab', 'bc', 'cq']",2,0.5,1.0,0

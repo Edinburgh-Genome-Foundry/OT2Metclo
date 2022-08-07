@@ -1,0 +1,14 @@
+Welcome to the MetcloOT2 plan specific, to your assemblies!
+This documentation is a userguide that instructs the setup of the OT2 robot for multiplexed MetClo based DNA assembly. 
+
+MATERIALS
+> Software:
+  - OpenTrons OT-2 App
+  - Python 3
+> Hardware:
+  - OpenTron OT-2
+  - OpenTrons P20 Single Channel Electronic Pipette
+  - Opentrons Thermocycler
+  - Opentrons 96 Tip Rack 20ul
+
+
