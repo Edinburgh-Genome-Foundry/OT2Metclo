@@ -128,6 +128,7 @@ uncompressed_parts = []
 parts_concentration_size = []
 
 #Input .csv files 
+#Examples
 assembly_path = 'example/finalassembly.csv'
 part_path = 'example/parts.csv'
 #assembly_path = input('Input Full Pathway of Assembly (.csv):\n')
@@ -226,7 +227,7 @@ if (len(part_dictionary)+len(reagent_total) > 96) == True:
     sys.exit(1)
 else:
     #creates a dictionary that allocates a well to the reagents and parts
-     plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
+    plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
 
 header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2'], ['position', 'solution', 'well volume']]
 doc = ['assembly_data.csv','part_data.csv','reagents_data.csv', 'position_data.csv']
@@ -374,12 +375,17 @@ def __PDFtmcplate__(assembly_dictionary):
 
 pdf = PDF('P','mm','Letter')
 __PDFtitle__(f'OT2 Set-Up Instructions')
+pdf.set_font('helvetica','', 10)
+with open('doc/ins.txt', 'r') as f:
+    for i in f:
+        pdf.multi_cell(0,3,i)
+
+__PDFsubtitle__('OT2 Layout')
+pdf.image('doc/OT2bench.JPG',45,50,150)
 __PDFsubtitle__('Reagent Plate Layout (ul)')
 __PDFreagent_partplate__(plate_dictionary)
 __PDFsubtitle__('Thermocycler Plate with Assemblies')
 __PDFtmcplate__(assembly_dictionary)
-__PDFsubtitle__('OT2 Layout')
-pdf.image('OT2bench.jpeg',45,50,150)
 __PDFtitle__(f'{str(len(assembly_dictionary))} Assemblies')
 for i in assembly_dictionary:
     __PDFassembly__(i)
@@ -388,12 +394,11 @@ __PDFparts__(part_dictionary, parts_concentration_size,part_count)
 __PDFtitle__(f'Total Reagents Volumes Required (ul) *1.2')
 __PDFreagents__(reagent_total)
 
-
-
 try: 
     pdf.output('metclo_plan.pdf')
     print('metclo_plan.pdf written succesfully.')
 except:
     print('metclo_plan.pdf not written')
     sys.exit(1)
+
 
