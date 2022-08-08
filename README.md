@@ -13,9 +13,10 @@ Welcome to MetCloOT2. This program is designed to accept information about metcl
 2. Create 2 input .csv files, one containing informations of the assemblies and the other infomration about the parts. *Under /example, 2 files are provided depicting the layout of the .csv files.* The assembly file, will look very similar to the assembly plan used in [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_assemblies) with the exception that a assembly size columb in added. 
 3. Assure that 30fmol of all parts is equal to atleast 1ul. Use the new concentration in the part.csv file. 
 Use the following formula:
- <img src="doc/volume_formula.JPG" alt="drawing" width="400"/>
+ <img src="doc/volume_formula.JPG" alt="drawing" width="350" class="center"/ >
 Or copy this formula into excel:
-*=ROUND((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
+
+*=round((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
 
 4. Clone this MetcloOT2 repository from GitHub.
 5. Run the **metclo_plan.py** file and follow the instructions that appear in the terminal. 
