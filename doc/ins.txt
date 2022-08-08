@@ -1,11 +1,11 @@
 Welcome to the MetcloOT2 plan specific, to your assemblies!
-This documentation is a userguide that instructs the setup of the OT2 robot for multiplexed MetClo based DNA assembly. 
+This documentation is a userguide that instructs the setup of the OT2 robot for multiplexed MetClo based DNA assembly. Reading Lin & O'Callaghan (2018 & 2020) is highly recomended. 
 
 MATERIALS
 > Software:
   - OpenTrons OT-2 App
   - Python 3
-> FILES:
+> FILES within metclo_plan_files:
   - assembly_data.csv
   - part_data.csv
   - position_data.csv
@@ -15,5 +15,28 @@ MATERIALS
   - OpenTrons P20 Single Channel Electronic Pipette
   - Opentrons Thermocycler
   - Opentrons 96 Tip Rack 20ul
+> Consumables and reagents
+  - 30fmol of all part containing insert plasmids and assembly vectors.
+  - T4 ligase buffer
+  - T4 DNA ligase
+  - BsaI-HFv2
+  - ddH20
+
+PROTOCOL
+1. Follow the OpenTrons OT-2 get-started guidelines (https://support.opentrons.com/s/ot2-get-started). 
+2. Prepare the insert plasmids and assembly vectors as described by Reading Lin & O'Callaghan(2020). 
+3. Dilute plasmids and vectors where nessesary as mentioned in the README.md.
+4. Set up the OpenTrons OT-2 deck as depicted in the "OT2 LAYOUT" section. Additionally attach the P20 Single Channel Electronic Pipette to the left mount.
+5. The "REAGENT PLATE LAYOUT (ul)" depicts the positioning and volume of the reagents and the parts needed for the assembly. Manually pipette the volume of reagents and parts to their respective well. Example [A1 ('ligase_buffer.1',7.2)] means that 7.2ul of T4 ligase buffer needs to be allocated to A1. 
+6. Assure the metclo_plan_files file and the ot2metclo.py are within the same file and loaded on the computer which is connected to the OT2 and has the OpenTrons OT-2 App.
+7. Run the ot2metclo.py protocol on the OpenTrons OT-2 App by typing "python ot2metclo.py in the terminal"
+8. The final assemblies will be stored within the thermocycler module at 4 degrees celcius. The position of the assemblies are depicted in "THERMOCYCLER PLATE WITH ASSEMBLIES". These assemblies can now be transformed. 
+
+NOTES
+- "Assemblies" sections provides a summary of the assemblies' size, recommended transformation method based on size, parts and reagent volume. 
+- "Parts" section provides a summary of the parts' size, concentration (ng/ul), number of assemblies in which the part was used, the volume containing 30fmol, and the total volume of the part needed for the protocol. 
+
+
+  
 
 
