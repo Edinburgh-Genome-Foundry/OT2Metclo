@@ -14,11 +14,9 @@ Welcome to MetCloOT2. This program is designed to accept information about metcl
 3. Assure that 30fmol of all parts is equal to atleast 1ul. Use the new concentration in the part.csv file. 
 Use the following formula:
  <img src="doc/volume_formula.JPG" alt="drawing" width="400"/>
- 
 Or copy this formula into excel:
-
 *=ROUND((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
-4. Clone this MetcloOT2 repository from GitHub
+4. Clone this MetcloOT2 repository from GitHub.
 5. Run the **metclo_plan.py** file and follow the instructions that appear in the terminal. 
 6. The the protocol will generate 4 files:
 - metclo_plan.pdf
