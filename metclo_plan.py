@@ -125,11 +125,13 @@ uncompressed_parts = []
 parts_concentration_size = []
 
 #Input .csv files 
+#######################################################
 #Examples
-assembly_path = 'example/finalassembly.csv'
-part_path = 'example/parts.csv'
-#assembly_path = input('Input Full Pathway of Assembly (.csv):\n')
-#part_path = input('Input Full Pathway of Parts (.csv):\n')
+#assembly_path = 'example/input_files/finalassembly.csv'
+#part_path = 'example/input_files/parts.csv'
+#######################################################
+assembly_path = input('Input Full Pathway of Assembly (.csv):\n')
+part_path = input('Input Full Pathway of Parts (.csv):\n')
 assembly_file_name = assembly_path.split("/")[-1]
 part_file_name = part_path.split("/")[-1]
 
