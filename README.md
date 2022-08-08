@@ -16,6 +16,7 @@ Use the following formula:
  <img src="doc/volume_formula.JPG" alt="drawing" width="400"/>
 Or copy this formula into excel:
 *=ROUND((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
+
 4. Clone this MetcloOT2 repository from GitHub.
 5. Run the **metclo_plan.py** file and follow the instructions that appear in the terminal. 
 6. The the protocol will generate 4 files:
