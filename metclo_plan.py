@@ -240,7 +240,7 @@ else:
     plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
 
 header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2'], ['position', 'solution', 'well volume']]
-doc = ['assembly_data.csv','part_data.csv','reagents_data.csv', 'position_data.csv']
+doc = ['metclo_plan_files/assembly_data.csv','metclo_plan_files/part_data.csv','metclo_plan_files/reagents_data.csv', 'metclo_plan_files/position_data.csv']
 data = (assembly_dictionary, part_dictionary, reagent_dictionary, plate_dictionary)
 
 #makes the .csv input for the opentrons protocol
@@ -405,7 +405,7 @@ __PDFtitle__(f'Total Reagents Volumes Required (ul) *1.2')
 __PDFreagents__(reagent_total)
 
 try: 
-    pdf.output('metclo_plan.pdf')
+    pdf.output('metclo_plan_files/metclo_plan.pdf')
     print('metclo_plan.pdf written succesfully.')
 except:
     print('metclo_plan.pdf not written')
