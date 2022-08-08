@@ -39,10 +39,10 @@ def __makeplate__ ():
 
 
 
-assembly_data =  __openfile__('assembly_data.csv')
-part_data = __openfile__('part_data.csv')
-reagent_data = __openfile__('reagents_data.csv')
-position_data = __openfile__('position_data.csv')
+assembly_data =  __openfile__('metclo_plan_files/assembly_data.csv')
+part_data = __openfile__('metclo_plan_files/part_data.csv')
+reagent_data = __openfile__('metclo_plan_files/reagents_data.csv')
+position_data = __openfile__('metclo_plan_files/position_data.csv')
 #print('ASSEMBLY DATA\n', assembly_data)
 #print('\nPART DATA\n', part_data)
 #print('\nREAGENT DATA\n', reagent_data)
