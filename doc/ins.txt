@@ -5,6 +5,11 @@ MATERIALS
 > Software:
   - OpenTrons OT-2 App
   - Python 3
+> FILES:
+  - assembly_data.csv
+  - part_data.csv
+  - position_data.csv
+  - reagents_data.csv
 > Hardware:
   - OpenTron OT-2
   - OpenTrons P20 Single Channel Electronic Pipette
