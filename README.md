@@ -6,7 +6,7 @@ by Daniella Matute
 
 ## About MetCloOT2
 
-Welcome to MetCloOT2. This program is designed to accept information about metclo based assemblies and design a custom Opentron protocol capable of being run on OpenTrons' OT2 liquid handeling machine. The program is based on [Lin & O’Callaghan (2018)](https://doi.org/10.1093/nar/gky596) and [Lin & O'Callaghan(2020)](http://link.springer.com/10.1007/978-1-0716-0908-8_9).
+Welcome to MetCloOT2. This program is designed to accept information about metclo based assemblies and design a custom Opentron protocol capable of being run on OpenTrons' OT2 liquid handeling machine. The program is based on [Lin & O’Callaghan (2018)](https://doi.org/10.1093/nar/gky596) and [Lin & O'Callaghan(2020)](http://link.springer.com/10.1007/978-1-0716-0908-8_9) and reading them prior OT2Metclo usage is highly recommended.
 
 ## How too.
 1. Prior to using  MetCloOT2, assure the quality of the assembly and simulate the assembly using computational tools, such as those found in the [EGF's Cuba suite](https://cuba.genomefoundry.org/home).
