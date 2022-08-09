@@ -1,17 +1,16 @@
-# MetCloOT2 : Automated MetClo assembly on Opentron OT2 liquid handeling robot
-
-The University of Edinburgh - MSc Synthetic Biology and Biotechnology Dissertation
-
-by Daniella Matute 
+# MetCloOT2: Automated MetClo assembly on OpenTrons OT-2 liquid handling robot
 
 ## About MetCloOT2
 
-Welcome to MetCloOT2. This program is designed to accept information about metclo based assemblies and design a custom Opentron protocol capable of being run on OpenTrons' OT2 liquid handeling machine. The program is based on [Lin & O’Callaghan (2018)](https://doi.org/10.1093/nar/gky596) and [Lin & O'Callaghan(2020)](http://link.springer.com/10.1007/978-1-0716-0908-8_9) and reading them prior OT2Metclo usage is highly recommended.
+Welcome to MetCloOT2. The purpose of this repository is to enable the automation of MetClo based assemblies withing the OpenTrons' OT2 liquid handling robot. The program is based on [Lin & O’Callaghan (2018)](https://doi.org/10.1093/nar/gky596) and [Lin & O'Callaghan(2020)](http://link.springer.com/10.1007/978-1-0716-0908-8_9) work. Reading these two papers prior OT2Metclo implementation is highly recommended.
 
-## How too.
-1. Prior to using  MetCloOT2, assure the quality of the assembly and simulate the assembly using computational tools, such as those found in the [EGF's Cuba suite](https://cuba.genomefoundry.org/home).
-2. Create 2 input .csv files, one containing informations of the assemblies and the other infomration about the parts. *Under /example, 2 files are provided depicting the layout of the .csv files.* The assembly file, will look very similar to the assembly plan used in [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_assemblies) with the exception that a assembly size columb in added. 
-3. Assure that 30fmol of all parts is equal to atleast 1ul. Use the new concentration in the part.csv file. 
+This repository is part of a dissertation project necessary to fulfil the requirements of the MSc Synthetic Biology and Biotechnology programme at the University of Edinburgh.
+
+## How to
+1. Prior to using MetCloOT2, assure the quality of the assembly by means of computer aided designs and simulations, such tool can be found at the [EGF's Cuba suite](https://cuba.genomefoundry.org/home) or at [Edinburgh Genome Foundry’s]( https://github.com/Edinburgh-Genome-Foundry) GitHub page.
+2. Create 2 input .csv files, one containing information of the assemblies, and the other information about the part plasmids and assembly vector. Within the */example* folder there are two sample files depicting the expected layout of the .csv files. 
+If [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_assemblies) was used to simulate the assemblies (as recommended in step 1), it assembly plan can be used as the assembly.csv in MetCloOT2 with a slight modification. OT2Metclo requires an assembly-size column to be added to the assembly plan. 
+3. Assure that 30fmol of all parts plasmids and assembly vectors is equal to at least 1μl. 
 Use the following formula:
 <p align="center">
  <img src="doc/volume_formula.JPG" alt="drawing" width="350" align="center" class="center">
@@ -20,12 +19,22 @@ Or copy this formula into excel:
 
 *=round((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
 
-4. Clone this MetcloOT2 repository from GitHub.
-5. Run the **metclo_plan.py** file and follow the instructions that appear in the terminal. 
-6. The the protocol will generate 4 files:
+If the volume is lower than 1μl, then dilute the plasmid. If the volume is equal to or greater than 1μl, no dilution is necessary. 
+4. Install or check for the presence of the following packages: csv, math, string, sys, fpdf, opentrons, string and sys.
+Confirm that Python 3 is installed.
+Confirm that OT2 APP is downloaded and UpToDate.
+5. Clone this MetcloOT2 repository from GitHub.
+5. Open the terminal, navigate to the location of the cloned repository. Run the **metclo_plan.py** by typing “python metclo_plan.py” in the terminal. Follow the instructions that appear in the terminal.
+6. The protocol will generate 5 files:
 - metclo_plan.pdf
 - assembly_data.csv
 - part_data.csv
 - position_data.csv
-7. Read and follow the instruction of the **metclo_plan.pdf**. 
-8. Run **ot2metclo.py** on the Opentrons App. For assistance refer to [OT - 2 : Getting Started]( https://support.opentrons.com/s/ot2-get-started).
+- reagents_data.csv
+7. Read and confirm the assembly and part information of the **metclo_plan.pdf**. 
+8. Follow the instructions found in the metclo_plan.pdf.
+
+## Authors
+
+Daniella Matute – [DanyMatute](https://github.com/DanyMatute)
+
