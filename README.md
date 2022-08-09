@@ -38,12 +38,12 @@ Confirm that OT2 APP is downloaded and UpToDate.
 8. Read and confirm the assembly and part information of the **metclo_plan.pdf**. 
 9. Follow the instructions found in the metclo_plan.pdf.
 
-## Supervisor 
+### Supervisor 
 
 [Peter Vegh](https://github.com/veghp)
 
 
-## Author
+### Author
 
 [Daniella Matute](https://github.com/DanyMatute)
 
