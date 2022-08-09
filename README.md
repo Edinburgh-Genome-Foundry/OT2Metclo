@@ -20,21 +20,31 @@ Or copy this formula into excel:
 *=round((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
 
 If the volume is lower than 1μl, then dilute the plasmid. If the volume is equal to or greater than 1μl, no dilution is necessary. 
+
 4. Install or check for the presence of the following packages: csv, math, string, sys, fpdf, opentrons, string and sys.
 Confirm that Python 3 is installed.
 Confirm that OT2 APP is downloaded and UpToDate.
+
 5. Clone this MetcloOT2 repository from GitHub.
-5. Open the terminal, navigate to the location of the cloned repository. Run the **metclo_plan.py** by typing “python metclo_plan.py” in the terminal. Follow the instructions that appear in the terminal.
-6. The protocol will generate 5 files:
+
+6. Open the terminal, navigate to the location of the cloned repository. Run the **metclo_plan.py** by typing “python metclo_plan.py” in the terminal. Follow the instructions that appear in the terminal.
+
+7. The protocol will generate 5 files:
 - metclo_plan.pdf
 - assembly_data.csv
 - part_data.csv
 - position_data.csv
 - reagents_data.csv
-7. Read and confirm the assembly and part information of the **metclo_plan.pdf**. 
-8. Follow the instructions found in the metclo_plan.pdf.
+8. Read and confirm the assembly and part information of the **metclo_plan.pdf**. 
+9. Follow the instructions found in the metclo_plan.pdf.
 
-## Authors
+## Supervisor 
 
-Daniella Matute – [DanyMatute](https://github.com/DanyMatute)
+[Peter Vegh](https://github.com/veghp)
+
+
+## Author
+
+[Daniella Matute](https://github.com/DanyMatute)
+
 
