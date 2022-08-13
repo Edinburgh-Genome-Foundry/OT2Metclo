@@ -18,7 +18,7 @@ If [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_
     </p>
     Or copy this formula into excel:
 
-    *=round((18530.7 * [part lenght (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
+    *=round((18530.7 * [part length (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
 
     If the volume is lower than 1μl, then dilute the plasmid. If the volume is equal to or greater than 1μl, no dilution is necessary.
 
