@@ -1,4 +1,3 @@
-import os
 import csv, math, string
 import sys, os
 from fpdf import FPDF
@@ -109,11 +108,11 @@ def _check_part_congruency(
         )
         for i in irregular_assembly:
             print("\t", i, " found in assemblies ", irregular_assembly[i])
-
         _check = True
 
     if _check == True:
         sys.exit(1)
+
 
 # Creates a dictionary with the well-identifier as a key, and
 def _plate_dictionary_creator(reagent_total, part_dictionary):
@@ -205,7 +204,6 @@ for i in part_count:
             single_volume = _calcvolume(float(j[1]), float(j[2]))
             total_volume = round(part_count[i] * single_volume * 1.2, 3)
             plate, wellvolume, count = _volumecheck(j[0], total_volume)
-
             if len(plate) > 1:
                 many_wells_parts[j[0]] = [
                     len(plate),
@@ -263,9 +261,7 @@ else:
     # creates a dictionary that allocates a well to the reagents and parts
     plate_dictionary = _plate_dictionary_creator(reagent_dictionary, part_dictionary)
 
-
 os.mkdir('metclo_plan_files')
-
 header = [
     [
         "assembly name",
@@ -280,7 +276,6 @@ header = [
     ["reagent", "sum*1.2"],
     ["position", "solution", "well volume"],
 ]
-
 
 doc = [
     "metclo_plan_files/assembly_data.csv",
@@ -466,5 +461,8 @@ __PDFreagents__(reagent_total)
 try: 
     pdf.output('metclo_plan_files/metclo_plan.pdf')
     print('metclo_plan.pdf written succesfully.')
+except:
+    print('metclo_plan.pdf not written')
+    sys.exit(1)
 
 
