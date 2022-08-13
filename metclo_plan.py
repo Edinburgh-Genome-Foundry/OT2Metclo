@@ -1,6 +1,6 @@
 import os
 import csv, math, string
-import sys
+import sys, os
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
@@ -109,11 +109,11 @@ def _check_part_congruency(
         )
         for i in irregular_assembly:
             print("\t", i, " found in assemblies ", irregular_assembly[i])
+
         _check = True
 
     if _check == True:
         sys.exit(1)
-
 
 # Creates a dictionary with the well-identifier as a key, and
 def _plate_dictionary_creator(reagent_total, part_dictionary):
@@ -150,6 +150,7 @@ parts_concentration_size = []
 #######################################################
 assembly_path = input("Input Full Pathway of Assembly (.csv):\n")
 part_path = input("Input Full Pathway of Parts (.csv):\n")
+
 assembly_file_name = assembly_path.split("/")[-1]
 part_file_name = part_path.split("/")[-1]
 
@@ -203,12 +204,8 @@ for i in part_count:
         if i == j[0]:
             single_volume = _calcvolume(float(j[1]), float(j[2]))
             total_volume = round(part_count[i] * single_volume * 1.2, 3)
-            #############
-            #############
-            # if i == 'bq': total_volume = 690
-            #############
-            #############
             plate, wellvolume, count = _volumecheck(j[0], total_volume)
+
             if len(plate) > 1:
                 many_wells_parts[j[0]] = [
                     len(plate),
@@ -251,11 +248,6 @@ for i in assembly_dictionary:
     reagent_total["water"] += assembly_dictionary[i][5]
 for i in reagent_total:
     reagent_total[i] = round(reagent_total[i] * 1.2, 3)
-    #############
-    #############
-    # if i =='bsai': reagent_total[i] = 1700
-    #############
-    #############
     plate, wellvolume, count = _volumecheck(i, reagent_total[i])
 
     for q in range(len(plate)):
@@ -270,6 +262,9 @@ if (len(part_dictionary) + len(reagent_total) > 96) == True:
 else:
     # creates a dictionary that allocates a well to the reagents and parts
     plate_dictionary = _plate_dictionary_creator(reagent_dictionary, part_dictionary)
+
+
+os.mkdir('metclo_plan_files')
 
 header = [
     [
@@ -286,10 +281,6 @@ header = [
     ["position", "solution", "well volume"],
 ]
 
-try:
-    os.mkdir("metclo_plan_files")
-except:
-    pass
 
 doc = [
     "metclo_plan_files/assembly_data.csv",
@@ -297,305 +288,183 @@ doc = [
     "metclo_plan_files/reagents_data.csv",
     "metclo_plan_files/position_data.csv",
 ]
-data = (assembly_dictionary, part_dictionary, reagent_dictionary, plate_dictionary)
+data = (
+    assembly_dictionary,
+    part_dictionary,
+    reagent_dictionary,
+    plate_dictionary
+)
 
 # makes the .csv input for the opentrons protocol
 for i in range(len(header)):
     _makecvs(doc[i], header[i], data[i])
 
 
-# class PDF(FPDF):
-#     def header(self):
-#         self.set_font("helvetica", "B", 20)
-#         self.cell(
-#             0,
-#             10,
-#             "Automated MetClo Assembly Plan",
-#             border=False,
-#             new_x=XPos.LMARGIN,
-#             new_y=YPos.NEXT,
-#             align="C",
-#         )
-#         self.ln(10)
-
-#     def footer(self):
-#         self.set_y(-15)
-#         self.set_font("helvetica", "I", 10)
-#         self.cell(0, 10, f"Page {self.page_no()}/{{nb}}", align="C")
-
-
-# def __PDFtitle__(title):
-#     pdf.set_auto_page_break(auto=True, margin=15)
-#     pdf.add_page()
-#     pdf.set_font("helvetica", "BU", 16)
-#     pdf.cell(0, 10, title, border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
-#     pdf.set_font("helvetica", "B", 12)
-
-
-# def __PDFsubtitle__(title):
-#     pdf.add_page()
-#     pdf.set_font("helvetica", "B", 12)
-#     pdf.cell(0, 10, title, border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-
-
-# def __PDFassembly__(i):
-#     w4 = (pdf.w) / 4.4
-#     pdf.set_font("helvetica", "B", 14)
-#     pdf.cell(
-#         w4, 8, f"Assembly Name: {i}", border=0, new_x=XPos.LMARGIN, new_y=YPos.NEXT
-#     )
-#     pdf.set_font("helvetica", "", 12)
-#     pdf.cell(
-#         w4,
-#         6,
-#         f'Assembly Size: {str("{:,}".format(int(assembly_dictionary[i][0])))}',
-#         border=0,
-#         new_x=XPos.RIGHT,
-#     )
-#     if int(assembly_dictionary[i][0]) > 10000:
-#         protocol = "Electroporation"
-#     else:
-#         protocol = "Heat Shock"
-#     pdf.cell(
-#         w4, 6, f"(Recomend: {protocol})", border=0, new_x=XPos.LMARGIN, new_y=YPos.NEXT
-#     )
-#     pdf.set_font("helvetica", "B", 12)
-#     pdf.cell(
-#         0,
-#         6,
-#         f"{len(assembly_dictionary[i][1])} Parts",
-#         border=False,
-#         new_x=XPos.LMARGIN,
-#         new_y=YPos.NEXT,
-#     )
-#     pdf.set_font("helvetica", "", 12)
-#     count = 0
-#     for j in assembly_dictionary[i][1]:
-#         if count < 3:
-#             pdf.cell(w4, 6, j, border=True, new_x=XPos.RIGHT)
-#             count += 1
-#         else:
-#             pdf.cell(w4, 6, j, border=True, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#             count = 0
-#     if len(assembly_dictionary[i][1]) != 4:
-#         pdf.cell(0, 5, "", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     pdf.set_font("helvetica", "B", 12)
-#     pdf.cell(0, 8, "Reagents (ul)", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     pdf.set_font("helvetica", "", 12)
-#     for x in reagent_total:
-#         pdf.cell(w4, 6, x, border=True, new_x=XPos.RIGHT)
-#     pdf.cell(0, 6, "", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     for j in assembly_dictionary[i][-4:]:
-#         pdf.cell(w4, 6, str(j), border=True, new_x=XPos.RIGHT)
-#     pdf.cell(0, 12, "", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-
-
-# def __PDFparts__(part_dictionary, parts_concentration_size, part_count):
-#     w5 = (pdf.w) / 6.6
-#     pdf.cell(w5 + 10, 10, "Part Name", border=1, new_x=XPos.RIGHT)
-#     pdf.cell(w5 - 10, 10, "Size", border=1, new_x=XPos.RIGHT)
-#     pdf.cell(w5 - 10, 10, "Conc.", border=1, new_x=XPos.RIGHT)
-#     pdf.cell(w5, 10, "Times Used", border=1, new_x=XPos.RIGHT)
-#     pdf.cell(w5 + 5, 10, "30fmol (ul)", border=1, new_x=XPos.RIGHT)
-#     pdf.cell(w5 + 5, 10, "Total Volume", border=1, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     count = 0
-#     pdf.set_font("helvetica", "", 12)
-#     for i in part_count:
-#         pdf.cell(w5 + 10, 10, i, border=1, new_x=XPos.RIGHT)
-#         for j in parts_concentration_size:
-#             if i == j[0]:
-#                 pdf.cell(w5 - 10, 10, j[2], border=1, new_x=XPos.RIGHT)
-#                 pdf.cell(w5 - 10, 10, j[1], border=1, new_x=XPos.RIGHT)
-#                 pdf.cell(w5, 10, str(part_count[i]), border=1, new_x=XPos.RIGHT)
-#                 if i in many_wells_parts:
-#                     pdf.cell(
-#                         w5 + 5,
-#                         10,
-#                         str(many_wells_parts[i][1]),
-#                         border=1,
-#                         new_x=XPos.RIGHT,
-#                     )
-#                     pdf.cell(
-#                         w5 + 5,
-#                         10,
-#                         str(many_wells_parts[i][2]),
-#                         border=1,
-#                         new_x=XPos.LMARGIN,
-#                         new_y=YPos.NEXT,
-#                     )
-#                 else:
-#                     pdf.cell(
-#                         w5 + 5,
-#                         10,
-#                         str(part_dictionary[i][0]),
-#                         border=1,
-#                         new_x=XPos.RIGHT,
-#                     )
-#                     pdf.cell(
-#                         w5 + 5,
-#                         10,
-#                         str(part_dictionary[i][1]),
-#                         border=1,
-#                         new_x=XPos.LMARGIN,
-#                         new_y=YPos.NEXT,
-#                     )
+class PDF(FPDF):
+    def header(self):
+        self.set_font('helvetica','B',20)
+        self.cell(0,10,'Automated MetClo Assembly Plan',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+        self.ln(10)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('helvetica','I',10)
+        self.cell(0,10,f'Page {self.page_no()}/{{nb}}', align ='C')
+def __PDFtitle__(title):
+    pdf.set_auto_page_break(auto =True, margin =15)
+    pdf.add_page()
+    pdf.set_font('helvetica', 'BU', 16)
+    pdf.cell(0,10,title,border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT, align='C' )
+    pdf.set_font('helvetica','B', 12)
+def __PDFsubtitle__ (title):
+    pdf.add_page()
+    pdf.set_font('helvetica','B', 12)
+    pdf.cell(0,10,title,border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+def __PDFassembly__(i):
+    w4 = (pdf.w)/4.4
+    pdf.set_font('helvetica','B', 14)
+    pdf.cell(w4,8,f'Assembly Name: {i}',border = 0,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.set_font('helvetica','', 12)
+    pdf.cell(w4,6,f'Assembly Size: {str("{:,}".format(int(assembly_dictionary[i][0])))}',border = 0,new_x=XPos.RIGHT)
+    if int(assembly_dictionary[i][0]) > 10000:protocol = 'Electroporation'
+    else:protocol = 'Heat Shock'
+    pdf.cell(w4,6,f'(Recomend: {protocol})',border = 0,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.set_font('helvetica','B', 12)
+    pdf.cell(0,6,f'{len(assembly_dictionary[i][1])} Parts',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.set_font('helvetica','', 12)
+    count = 0
+    for j in assembly_dictionary[i][1]:
+        if count <3:
+            pdf.cell(w4,6,j,border = True,new_x=XPos.RIGHT)
+            count +=1
+        else:
+            pdf.cell(w4,6,j,border = True,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            count = 0
+    if len(assembly_dictionary[i][1])!= 4: 
+        pdf.cell(0,5,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.set_font('helvetica','B', 12)
+    pdf.cell(0,8,'Reagents (ul)',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    pdf.set_font('helvetica','', 12)
+    for x in reagent_total:
+        pdf.cell(w4,6,x,border = True,new_x=XPos.RIGHT)
+    pdf.cell(0,6,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+    for j in assembly_dictionary[i][-4:]:
+        pdf.cell(w4,6,str(j),border = True,new_x=XPos.RIGHT)
+    pdf.cell(0,12,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT)
+def __PDFparts__(part_dictionary, parts_concentration_size,part_count):
+    w5 = (pdf.w)/6.6
+    pdf.cell(w5+10,10,'Part Name',border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5-10,10,'Size',border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5-10,10,'Conc.',border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5,10,'Times Used',border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5+5,10,'30fmol (ul)',border = 1,new_x=XPos.RIGHT)
+    pdf.cell(w5+5,10,'Total Volume',border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    count = 0
+    pdf.set_font('helvetica','', 12)
+    for i in part_count:
+        pdf.cell(w5+10,10,i,border = 1,new_x=XPos.RIGHT)
+        for j in parts_concentration_size:
+            if i == j[0]:
+                pdf.cell(w5-10,10,j[2],border = 1,new_x=XPos.RIGHT)
+                pdf.cell(w5-10,10,j[1],border = 1,new_x=XPos.RIGHT)
+                pdf.cell(w5,10,str(part_count[i]),border = 1,new_x=XPos.RIGHT)
+                if i in many_wells_parts:
+                    pdf.cell(w5+5,10,str(many_wells_parts[i][1]),border = 1,new_x=XPos.RIGHT)
+                    pdf.cell(w5+5,10,str(many_wells_parts[i][2]),border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                else:
+                    pdf.cell(w5+5,10,str(part_dictionary[i][0]),border = 1,new_x=XPos.RIGHT)
+                    pdf.cell(w5+5,10,str(part_dictionary[i][1]),border = 1,new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+def __PDFreagents__(reagent_total):
+    w4 = (pdf.w)/4.4
+    for i in reagent_total:
+        pdf.cell(w4,8,i,border = True,new_x=XPos.RIGHT)
+    pdf.ln(8)
+    for i in reagent_total:
+        pdf.cell(w4,8,str(reagent_total[i]),border = True,new_x=XPos.RIGHT)
+def __PDFreagent_partplate__(plate_dictionary):
+    w4 = (pdf.w)/4.4
+    count = 0
+    pdf.set_font('helvetica','', 8)
+    for i in plate_dictionary:
+        if list(i)[0] == 'A' or list(i)[0] == 'B' or list(i)[0] =='C'or list(i)[0] =='D':
+            if count <3:
+                pdf.cell(w4,6,i+'  '+str(plate_dictionary[i]),border = True,new_x=XPos.RIGHT)
+                count +=1
+            else:
+                pdf.cell(w4,6,i+'  '+str(plate_dictionary[i]),border = True,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+                count =0
+    pdf.cell(0,10,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+    for i in plate_dictionary:
+        if list(i)[0] == 'E' or list(i)[0] == 'F' or list(i)[0] =='G'or list(i)[0] =='H':
+            if count <3:
+                pdf.cell(w4,6,i+'  '+str(plate_dictionary[i]),border = True,new_x=XPos.RIGHT)
+                count +=1
+            else:
+                pdf.cell(w4,6,i+'  '+str(plate_dictionary[i]),border = True,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+                count =0
+def __PDFtmcplate__(assembly_dictionary):
+    plate_dictionary = {}
+    alpha = list(string.ascii_uppercase)[:8]
+    keysList = list(assembly_dictionary.keys())
+    count = 0
+    for j in range(12):
+        for i in range(8):
+            plate_dictionary[alpha[i]+str(j+1)]= ''
+    for i in plate_dictionary:
+        if count < len(keysList):
+            plate_dictionary[i] = keysList[count]
+            count += 1
+    count = 0
+    w4 = (pdf.w)/4.4
+    pdf.set_font('helvetica','', 8)
+    for i in plate_dictionary:
+        if list(i)[0] == 'A' or list(i)[0] == 'B' or list(i)[0] =='C'or list(i)[0] =='D':
+            if count <3:
+                pdf.cell(w4,6,i+'  '+plate_dictionary[i],border = True,new_x=XPos.RIGHT)
+                count +=1
+            else:
+                pdf.cell(w4,6,i+'  '+plate_dictionary[i],border = True,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+                count =0
+    pdf.cell(0,10,'',border = False,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+    for i in plate_dictionary:
+        if list(i)[0] == 'E' or list(i)[0] == 'F' or list(i)[0] =='G'or list(i)[0] =='H':
+            if count <3:
+                pdf.cell(w4,6,i+'  '+plate_dictionary[i],border = True,new_x=XPos.RIGHT)
+                count +=1
+            else:
+                pdf.cell(w4,6,i+'  '+plate_dictionary[i],border = True,new_x=XPos.LMARGIN,new_y=YPos.NEXT )
+                count =0
 
 
-# def __PDFreagents__(reagent_total):
-#     w4 = (pdf.w) / 4.4
-#     for i in reagent_total:
-#         pdf.cell(w4, 8, i, border=True, new_x=XPos.RIGHT)
-#     pdf.ln(8)
-#     for i in reagent_total:
-#         pdf.cell(w4, 8, str(reagent_total[i]), border=True, new_x=XPos.RIGHT)
+pdf = PDF('P','mm','Letter')
+__PDFtitle__(f'OT2 Set-Up Instructions')
+pdf.set_font('helvetica','', 10)
+with open('doc/ins.txt', 'r') as f:
+    for i in f:
+        pdf.multi_cell(0,3,i)
+        '''try:
+        
+            pdf.multi_cell(0,3,i)
+        except:
+            print(i)
+        '''
 
 
-# def __PDFreagent_partplate__(plate_dictionary):
-#     w4 = (pdf.w) / 4.4
-#     count = 0
-#     pdf.set_font("helvetica", "", 8)
-#     for i in plate_dictionary:
-#         if (
-#             list(i)[0] == "A"
-#             or list(i)[0] == "B"
-#             or list(i)[0] == "C"
-#             or list(i)[0] == "D"
-#         ):
-#             if count < 3:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + str(plate_dictionary[i]),
-#                     border=True,
-#                     new_x=XPos.RIGHT,
-#                 )
-#                 count += 1
-#             else:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + str(plate_dictionary[i]),
-#                     border=True,
-#                     new_x=XPos.LMARGIN,
-#                     new_y=YPos.NEXT,
-#                 )
-#                 count = 0
-#     pdf.cell(0, 10, "", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     for i in plate_dictionary:
-#         if (
-#             list(i)[0] == "E"
-#             or list(i)[0] == "F"
-#             or list(i)[0] == "G"
-#             or list(i)[0] == "H"
-#         ):
-#             if count < 3:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + str(plate_dictionary[i]),
-#                     border=True,
-#                     new_x=XPos.RIGHT,
-#                 )
-#                 count += 1
-#             else:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + str(plate_dictionary[i]),
-#                     border=True,
-#                     new_x=XPos.LMARGIN,
-#                     new_y=YPos.NEXT,
-#                 )
-#                 count = 0
+__PDFsubtitle__('OT2 Layout')
+pdf.image('doc/OT2bench.JPG',45,50,150)
+__PDFsubtitle__('Reagent Plate Layout (ul)')
+__PDFreagent_partplate__(plate_dictionary)
+__PDFsubtitle__('Thermocycler Plate with Assemblies')
+__PDFtmcplate__(assembly_dictionary)
+__PDFtitle__(f'{str(len(assembly_dictionary))} Assemblies')
+for i in assembly_dictionary:
+    __PDFassembly__(i)
+__PDFtitle__(f'{str(len(part_dictionary))} Parts')
+__PDFparts__(part_dictionary, parts_concentration_size,part_count)
+__PDFtitle__(f'Total Reagents Volumes Required (ul) *1.2')
+__PDFreagents__(reagent_total)
 
+try: 
+    pdf.output('metclo_plan_files/metclo_plan.pdf')
+    print('metclo_plan.pdf written succesfully.')
 
-# def __PDFtmcplate__(assembly_dictionary):
-#     plate_dictionary = {}
-#     alpha = list(string.ascii_uppercase)[:8]
-#     keysList = list(assembly_dictionary.keys())
-#     count = 0
-#     for j in range(12):
-#         for i in range(8):
-#             plate_dictionary[alpha[i] + str(j + 1)] = ""
-#     for i in plate_dictionary:
-#         if count < len(keysList):
-#             plate_dictionary[i] = keysList[count]
-#             count += 1
-#     count = 0
-#     w4 = (pdf.w) / 4.4
-#     pdf.set_font("helvetica", "", 8)
-#     for i in plate_dictionary:
-#         if (
-#             list(i)[0] == "A"
-#             or list(i)[0] == "B"
-#             or list(i)[0] == "C"
-#             or list(i)[0] == "D"
-#         ):
-#             if count < 3:
-#                 pdf.cell(
-#                     w4, 6, i + "  " + plate_dictionary[i], border=True, new_x=XPos.RIGHT
-#                 )
-#                 count += 1
-#             else:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + plate_dictionary[i],
-#                     border=True,
-#                     new_x=XPos.LMARGIN,
-#                     new_y=YPos.NEXT,
-#                 )
-#                 count = 0
-#     pdf.cell(0, 10, "", border=False, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-#     for i in plate_dictionary:
-#         if (
-#             list(i)[0] == "E"
-#             or list(i)[0] == "F"
-#             or list(i)[0] == "G"
-#             or list(i)[0] == "H"
-#         ):
-#             if count < 3:
-#                 pdf.cell(
-#                     w4, 6, i + "  " + plate_dictionary[i], border=True, new_x=XPos.RIGHT
-#                 )
-#                 count += 1
-#             else:
-#                 pdf.cell(
-#                     w4,
-#                     6,
-#                     i + "  " + plate_dictionary[i],
-#                     border=True,
-#                     new_x=XPos.LMARGIN,
-#                     new_y=YPos.NEXT,
-#                 )
-#                 count = 0
-
-
-# pdf = PDF("P", "mm", "Letter")
-# __PDFtitle__(f"OT2 Set-Up Instructions")
-# pdf.set_font("helvetica", "", 10)
-# with open("doc/ins.txt", "r") as f:
-#     for i in f:
-#         pdf.multi_cell(0, 3, i)
-
-# __PDFsubtitle__("OT2 Layout")
-# pdf.image("doc/OT2bench.JPG", 45, 50, 150)
-# __PDFsubtitle__("Reagent Plate Layout (ul)")
-# __PDFreagent_partplate__(plate_dictionary)
-# __PDFsubtitle__("Thermocycler Plate with Assemblies")
-# __PDFtmcplate__(assembly_dictionary)
-# __PDFtitle__(f"{str(len(assembly_dictionary))} Assemblies")
-# for i in assembly_dictionary:
-#     __PDFassembly__(i)
-# __PDFtitle__(f"{str(len(part_dictionary))} Parts")
-# __PDFparts__(part_dictionary, parts_concentration_size, part_count)
-# __PDFtitle__(f"Total Reagents Volumes Required (ul) *1.2")
-# __PDFreagents__(reagent_total)
-
-# try:
-#     pdf.output("metclo_plan_files/metclo_plan.pdf")
-#     print("metclo_plan.pdf written succesfully.")
-# except:
-#     print("metclo_plan.pdf not written")
-#     sys.exit(1)
 
