@@ -1,5 +1,5 @@
 import csv, math, string
-import sys
+import sys, os
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
@@ -239,6 +239,8 @@ else:
     #creates a dictionary that allocates a well to the reagents and parts
     plate_dictionary = __plate_dictionary_creator__(reagent_dictionary, part_dictionary)
 
+os.mkdir('metclo_plan_files')
+
 header = [['assembly name','assembly size', 'parts', 'ligase buffer', 'DNA ligase', 'bsai','water'],['part name', 'volume with 30fmol', 'sum*1.2'],['reagent', 'sum*1.2'], ['position', 'solution', 'well volume']]
 doc = ['metclo_plan_files/assembly_data.csv','metclo_plan_files/part_data.csv','metclo_plan_files/reagents_data.csv', 'metclo_plan_files/position_data.csv']
 data = (assembly_dictionary, part_dictionary, reagent_dictionary, plate_dictionary)
@@ -389,6 +391,13 @@ pdf.set_font('helvetica','', 10)
 with open('doc/ins.txt', 'r') as f:
     for i in f:
         pdf.multi_cell(0,3,i)
+        '''try:
+        
+            pdf.multi_cell(0,3,i)
+        except:
+            print(i)
+        '''
+
 
 __PDFsubtitle__('OT2 Layout')
 pdf.image('doc/OT2bench.JPG',45,50,150)

@@ -1,4 +1,4 @@
-Welcome to the MetcloOT2 plan specific, to your assemblies!
+Welcome to the MetcloOT2, plan specific to your assemblies!
 This documentation is a userguide that instructs the setup of the OT2 robot for multiplexed MetClo based DNA assembly. Reading Lin & O'Callaghan (2018 & 2020) is highly recomended. 
 
 MATERIALS
@@ -23,15 +23,15 @@ MATERIALS
   - ddH20
 
 PROTOCOL
-1. Within the terminal, [simulate the OpenTrons OT-2 protocol:]( https://support.opentrons.com/s/article/Simulating-OT-2-protocols-on-your-computer?) ot2metclo.py. Review and confirm the output of the simulation. 
-2. Follow the OpenTrons OT-2 get-started guidelines (https://support.opentrons.com/s/ot2-get-started). 
-3. Prepare the insert plasmids and assembly vectors as described in Lin & O’Callaghan (2020). 
-4. Dilute the plasmids and vectors where necessary, as mentioned in the README.md.
+1. Within the terminal, simulate the OpenTrons OT-2 protocol: ot2metclo.py. Review and confirm the output of the simulation. https://support.opentrons.com/s/article/Simulating-OT-2-protocols-on-your-computer?) 
+2. Follow the OpenTrons OT-2 get-started guidelines to prepare the Opentron OT2. https://support.opentrons.com/s/ot2-get-started). 
+3. Prepare the insert plasmids and assembly vectors as described in Lin & O' Callaghan (2020). 
+4. As mentioned in the README.md, dilute the plasmids and vectors where necessary.
 5. Set up the OpenTrons OT-2 deck as depicted in the "OT2 LAYOUT" section. Additionally attach the P20 Single Channel Electronic Pipette to the left mount.
 6. The "REAGENT PLATE LAYOUT (ul)" depicts the positioning and volume of the reagents and the parts needed for the assembly. Manually pipette the volume of reagents and parts to their respective well. Example [A1 ('ligase_buffer.1',7.2)] means that 7.2ul of T4 ligase buffer needs to be allocated to A1. 
 7. Assure that the metclo_plan_files produced from metclo_plan.py and the ot2metclo.py are within the same file. Transfer this file to the computer which is connected to the OT2 robot and has the downloaded OpenTrons OT-2 App.
-8. Run the ot2metclo.py protocol on the OpenTrons OT-2 App by typing "python ot2metclo.py” in the terminal. For assistance refer to [OT - 2 : Getting Started]( https://support.opentrons.com/s/ot2-get-started).
-9. The final assemblies will be stored within the thermocycler module at 4 degrees Celsius. The positions of the assemblies are depicted in "THERMOCYCLER PLATE WITH ASSEMBLIES". These assemblies can be used for further application. 
+8. Run the ot2metclo.py protocol on the OpenTrons OT-2 App. For assistance refer to OT - 2 : Getting Started. https://support.opentrons.com/s/ot2-get-started).
+9. The final assemblies will be stored within the thermocycler module at 4 degrees Celsius. The positions of the assemblies are depicted in "THERMOCYCLER PLATE WITH ASSEMBLIES". These assemblies can be used for further applications. 
 
 
 NOTES
@@ -39,19 +39,8 @@ NOTES
 - The "Parts" section provides a summary of the parts' size, concentration (ng/ul), number of assemblies in which the part was used, the volume containing 30fmol, and the total volume of the part needed for the protocol. 
 
 REFERENCE
-Lin, D. & O’Callaghan, C.A. (2020) Hierarchical Modular DNA Assembly Using MetClo. In: S. Chandran & K.W. George (eds.). DNA Cloning and Assembly. Methods in Molecular Biology. New York, NY, Springer US. pp. 143–159. doi:10.1007/978-1-0716-0908-8_9.
-
-7. Run the ot2metclo.py protocol on the OpenTrons OT-2 App by typing "python ot2metclo.py in the terminal"
-8. The final assemblies will be stored within the thermocycler module at 4 degrees celcius. The position of the assemblies are depicted in "THERMOCYCLER PLATE WITH ASSEMBLIES". These assemblies can now be transformed. 
-
-NOTES
-- "Assemblies" sections provides a summary of the assemblies' size, recommended transformation method based on size, parts and reagent volume. 
-- "Parts" section provides a summary of the parts' size, concentration (ng/ul), number of assemblies in which the part was used, the volume containing 30fmol, and the total volume of the part needed for the protocol. 
-
-REFERENCE
-Lin, D. & O’Callaghan, C.A. (2018) MetClo: methylase-assisted hierarchical DNA assembly using a single type IIS restriction enzyme. Nucleic Acids Research. 46 (19), e113. doi:10.1093/nar/gky596.
-
-Lin, D. & O’Callaghan, C.A. (2020) Hierarchical Modular DNA Assembly Using MetClo. In: S. Chandran & K.W. George (eds.). DNA Cloning and Assembly. Methods in Molecular Biology. New York, NY, Springer US. pp. 143–159. doi:10.1007/978-1-0716-0908-8_9.
+Lin, D. & O'Callaghan, C.A. (2018) MetClo: methylase-assisted hierarchical DNA assembly using a single type IIS restriction enzyme. Nucleic Acids Research. 46 (19), e113. doi:10.1093/nar/gky596.
+Lin, D. & O'Callaghan, C.A. (2020) Hierarchical Modular DNA Assembly Using MetClo. In: S. Chandran & K.W. George (eds.). DNA Cloning and Assembly. Methods in Molecular Biology. New York, NY, Springer US. pp. 143-159. doi:10.1007/978-1-0716-0908-8_9.
 
 
   
