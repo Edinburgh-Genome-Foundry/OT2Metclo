@@ -14,7 +14,7 @@ If [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_
 3. Assure that the volume of 30fmol of all part plasmids and assembly vectors is at least 1μl.
     Use the following formula:
     <p align="center">
-    <img src="doc/volume_formula.JPG" alt="drawing" width="350" align="center" class="center">
+    <img src="doc/formula.JPG" alt="drawing" width="350" align="center" class="center">
     </p>
     Or copy this formula into excel:
 
