@@ -21,7 +21,9 @@ If [Simulate Golden Gate Assemblies](https://cuba.genomefoundry.org/simulate_gg_
     *=round((18530.7 * [part length (bp)]  + 1081.2) / ( [part concentration (ng/ul)] * 10^6) ,3)*
 
     If the volume is lower than 1μl, then dilute the plasmid. If the volume is equal to or greater than 1μl, no dilution is necessary.
-
+    <p align="center">
+    <img src="doc/example.JPG" alt="drawing" width="350" align="center" class="center">
+    </p>
 4. Install or check for the presence of the following packages: csv, math, string, sys, fpdf, opentrons, string and sys.
 Confirm that Python 3 is installed.
 Confirm that OT2 APP is downloaded and UpToDate.
